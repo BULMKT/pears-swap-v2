@@ -56,7 +56,7 @@ async function getZeroxAllowanceHolderQuote(
     sellAmount,
     taker,
     swapFeeRecipient: FEE_RECIPIENT,
-    swapFeeBps: '50', // 0.50% fee (0.05% = 5 bps, but let's try 50 bps = 0.5%)
+    swapFeeBps: '8', // 0.08% fee (8 basis points)
     swapFeeToken: buyToken, // Fee in USDC
     slippageBps: '200', // 2% slippage
   });
@@ -76,7 +76,7 @@ async function getZeroxAllowanceHolderQuote(
 
 async function PEARS_PRODUCTION_READY() {
   console.log('🍐 PEARS PRODUCTION READY - 0x Allowance Holder');
-  console.log('Using 0x API v2 with automatic fee collection on Base');
+  console.log('Using 0x API v2 with automatic 0.08% fee collection on Base');
 
   try {
     // Step 1: Check initial balances
@@ -104,7 +104,7 @@ async function PEARS_PRODUCTION_READY() {
     console.log('   Sell amount:', formatUnits(BigInt(quote.sellAmount), 18), 'WETH');
     console.log('   Buy amount:', formatUnits(BigInt(quote.buyAmount), 6), 'USDC');
     console.log('   Price:', (Number(formatUnits(BigInt(quote.buyAmount), 6)) / Number(formatUnits(BigInt(quote.sellAmount), 18))).toFixed(2), 'USDC/WETH');
-    console.log('   Fee recipient gets 0.5% automatically');
+    console.log('   Fee recipient gets 0.08% automatically');
     console.log('   Contract:', quote.transaction.to);
 
     // Step 3: Check and set allowance
@@ -171,7 +171,7 @@ async function PEARS_PRODUCTION_READY() {
         console.log('✅ WETH spent:', wethSpent.toFixed(6));
         console.log('✅ USDC received:', usdcReceived.toFixed(6));
         console.log('✅ Effective price:', (usdcReceived / wethSpent).toFixed(2), 'USDC/WETH');
-        console.log('✅ Platform fee automatically collected via 0x');
+        console.log('✅ Platform fee (0.08%) automatically collected via 0x');
         console.log('✅ Best price routing across all Base DEXs');
         console.log('✅ MEV protection enabled');
         console.log('✅ Sub-second quote times');
@@ -190,8 +190,11 @@ async function PEARS_PRODUCTION_READY() {
 
     // If this fails, try with smaller fee
     if (error.message.includes('swapFeeBps')) {
-      console.log('\n💡 Retrying with 0.05% fee (5 bps)...');
-      // Could retry with swapFeeBps: '5' here
+      console.log('\n💡 Fee error detected. Current fee set to 8 bps (0.08%)');
+      console.log('   This is already optimized for elite pricing vs competitors:');
+      console.log('   - PEARS: 0.08%');
+      console.log('   - Uniswap Labs: 0.25%');
+      console.log('   - OpenOcean: 0.10%');
     }
   }
 }
