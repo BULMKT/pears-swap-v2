@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEARS Swap V2 - Fresh Start</title>
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .swap-box {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4F46E5;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      background: #4F46E5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+    }
+    button:hover { background: #4338CA; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.success { background: #065f46; border: 1px solid #10B981; }
+    .status.error { background: #7f1d1d; border: 1px solid #EF4444; }
+    .status.loading { background: #1e3a8a; border: 1px solid #3B82F6; }
+    .debug {
+      background: #333;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 12px;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍐 PEARS V2 - Fresh Start</h1>
+
+    <div class="swap-box">
+      <input type="text" id="amountInput" placeholder="0.005" />
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <button id="swapBtn" onclick="executeSwap()" disabled>Swap 0.005 ETH → USDC</button>
+
+      <div id="status" class="status"></div>
+      <div id="debug" class="debug"></div>
+    </div>
+  </div>
+
+  <script>
+    // FRESH START - Direct approach that mirrors working backend
+    let provider = null;
+    let signer = null;
+    let userAddress = null;
+
+    function log(message) {
+      const debug = document.getElementById('debug');
+      debug.innerHTML += new Date().toLocaleTimeString() + ': ' + message + '\n';
+      debug.scrollTop = debug.scrollHeight;
+      console.log(message);
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status show ${type}`;
+    }
+
+    // Connect wallet - simplified
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          showStatus('Please install MetaMask', 'error');
+          return;
+        }
+
+        log('🔗 Connecting to MetaMask...');
+
+        // Switch to Base
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x2105',
+                chainName: 'Base',
+                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                rpcUrls: ['https://mainnet.base.org'],
+                blockExplorerUrls: ['https://basescan.org']
+              }]
+            });
+          }
+        }
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send('eth_requestAccounts', []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        log(`✅ Connected: ${userAddress}`);
+        document.getElementById('connectBtn').textContent = 'Connected';
+        document.getElementById('connectBtn').disabled = true;
+        document.getElementById('swapBtn').disabled = false;
+
+        showStatus(`Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`, 'success');
+
+      } catch (error) {
+        log(`❌ Connection failed: ${error.message}`);
+        showStatus('Connection failed', 'error');
+      }
+    }
+
+    // Execute swap - EXACT copy of working backend approach
+    async function executeSwap() {
+      if (!signer || !userAddress) {
+        showStatus('Please connect wallet first', 'error');
+        return;
+      }
+
+      try {
+        showStatus('🚀 Getting fresh quote...', 'loading');
+        log('🚀 Starting fresh swap execution...');
+
+        // Step 1: Get fresh quote-and-execute data (EXACT backend approach)
+        const amount = document.getElementById('amountInput').value || '0.005';
+        const sellAmount = ethers.parseEther(amount).toString();
+
+        log(`💰 Selling ${amount} ETH (${sellAmount} wei)`);
+
+        const response = await fetch('/api/fresh-swap', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellAmount: sellAmount,
+            taker: userAddress
+          })
+        });
+
+        if (!response.ok) throw new Error('Quote API failed');
+        const swapData = await response.json();
+
+        log(`✅ Quote received: ${swapData.buyAmount} USDC`);
+        log(`🔧 Contract: ${swapData.to}`);
+        log(`🔧 Value: ${swapData.value}`);
+
+        // Step 2: Execute transaction (SIMPLE approach)
+        showStatus('🔥 Executing swap...', 'loading');
+
+        const txParams = {
+          to: swapData.to,
+          data: swapData.data,
+          value: BigInt(swapData.value || '0') // Use API value directly
+        };
+
+        log(`🔧 TX Params: to=${txParams.to}, value=${txParams.value.toString()}`);
+
+        // Estimate gas
+        const gasEstimate = await provider.estimateGas({
+          ...txParams,
+          from: userAddress
+        });
+
+        log(`✅ Gas estimate: ${gasEstimate.toString()}`);
+
+        // Send transaction
+        const tx = await signer.sendTransaction({
+          ...txParams,
+          gasLimit: gasEstimate
+        });
+
+        log(`🎉 Transaction sent: ${tx.hash}`);
+        showStatus(`Swap submitted! ${tx.hash.slice(0, 10)}...`, 'success');
+
+        // Wait for confirmation
+        const receipt = await tx.wait();
+
+        if (receipt.status === 1) {
+          log(`🎊 SUCCESS! Gas used: ${receipt.gasUsed.toString()}`);
+          showStatus('✅ Swap completed successfully!', 'success');
+
+          setTimeout(() => {
+            window.open(`https://basescan.org/tx/${tx.hash}`, '_blank');
+          }, 2000);
+        } else {
+          throw new Error('Transaction failed');
+        }
+
+      } catch (error) {
+        log(`❌ Swap failed: ${error.message}`);
+        showStatus(`Swap failed: ${error.message}`, 'error');
+      }
+    }
+
+    // Auto-connect if available
+    window.addEventListener('load', async () => {
+      if (window.ethereum) {
+        const accounts = await window.ethereum.request({ method: 'eth_accounts' });
+        if (accounts.length > 0) {
+          await connectWallet();
+        }
+      }
+    });
+  </script>
+</body>
+</html>
