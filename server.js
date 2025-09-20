@@ -276,27 +276,7 @@ app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
-// Serve new frontend
-app.get('/fresh', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index-new.html'));
-});
-
-// Serve optimized frontend
-app.get('/optimized', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index-optimized.html'));
-});
-
-// Serve Phase 2 Flashblocks frontend
-app.get('/phase2', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index-phase2.html'));
-});
-
-// Serve Production frontend (cost-optimized)
-app.get('/production', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index-production.html'));
-});
-
-// Serve V3 Multi-token frontend
+// Serve V3 Multi-token frontend (main interface)
 app.get('/v3', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index-v3.html'));
 });
