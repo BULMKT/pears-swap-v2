@@ -1,15 +1,18 @@
 {
-  "name": "pears-swap",
-  "version": "1.0.0",
+  "name": "pears-swap-v3",
+  "version": "3.0.0",
   "type": "module",
-  "description": "",
-  "main": "index.js",
+  "description": "PEARS Swap V3 - Multi-Token DEX on Base Network",
+  "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node server.js",
+    "dev": "node server.js",
+    "build": "echo 'No build step needed'",
+    "vercel-build": "echo 'No build step needed'"
   },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "keywords": ["defi", "dex", "base", "ethereum", "swap", "0x", "flashblocks"],
+  "author": "PEARS",
+  "license": "MIT",
   "dependencies": {
     "axios": "^1.12.2",
     "cors": "^2.8.5",
@@ -22,5 +25,8 @@
     "@types/node": "^24.5.2",
     "ts-node": "^10.9.2",
     "typescript": "^5.9.2"
+  },
+  "engines": {
+    "node": ">=18.0.0"
   }
 }
