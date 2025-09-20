@@ -19,9 +19,5 @@
       "src": "/(.*)",
       "dest": "/public/$1"
     }
-  ],
-  "env": {
-    "ZEROX_API_KEY": "@zerox_api_key",
-    "FEE_RECIPIENT": "@fee_recipient"
-  }
+  ]
 }
