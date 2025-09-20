@@ -1,0 +1,817 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEARS Swap V3 - Multi-Token</title>
+
+  <!-- DNS Prefetch ONLY (no auto-connections) -->
+  <link rel="dns-prefetch" href="https://api.0x.org">
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .swap-box {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4F46E5;
+    }
+    .v3-badge {
+      background: #065f46;
+      border: 1px solid #10B981;
+      padding: 8px 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      text-align: center;
+      font-weight: 600;
+    }
+    .token-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      margin-bottom: 16px;
+      padding: 16px;
+      background: #1a1a1a;
+      border-radius: 12px;
+      border: 1px solid #333;
+    }
+    .token-selector {
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      padding: 12px;
+      font-size: 14px;
+      min-width: 120px;
+      cursor: pointer;
+    }
+    .token-selector:hover { border-color: #4F46E5; }
+    .amount-input {
+      flex: 1;
+      padding: 12px;
+      font-size: 16px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+    }
+    .balance-display {
+      font-size: 12px;
+      color: #888;
+      margin-top: 4px;
+      cursor: pointer;
+    }
+    .balance-display:hover {
+      color: #4F46E5;
+      text-decoration: underline;
+    }
+    .price-display {
+      font-size: 12px;
+      color: #10B981;
+      font-weight: 500;
+    }
+    .flip-button {
+      align-self: center;
+      background: #4F46E5;
+      border: none;
+      border-radius: 50%;
+      width: 40px;
+      height: 40px;
+      color: white;
+      cursor: pointer;
+      font-size: 18px;
+      margin: 0 auto;
+      transition: transform 0.2s;
+    }
+    .flip-button:hover { transform: rotate(180deg); }
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      background: #4F46E5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    button:hover { background: #4338CA; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+    button.sending {
+      background: #059669;
+      animation: pulse 1s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.success { background: #065f46; border: 1px solid #10B981; }
+    .status.error { background: #7f1d1d; border: 1px solid #EF4444; }
+    .status.loading { background: #1e3a8a; border: 1px solid #3B82F6; }
+    .status.warning { background: #854d0e; border: 1px solid #F59E0B; }
+    .custom-token {
+      display: flex;
+      gap: 8px;
+      margin-top: 8px;
+    }
+    .custom-token input {
+      flex: 1;
+      padding: 8px;
+      font-size: 12px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 4px;
+      color: #fff;
+    }
+    .add-token-btn {
+      padding: 8px 12px;
+      font-size: 12px;
+      background: #059669;
+      border: none;
+      border-radius: 4px;
+      color: white;
+      cursor: pointer;
+    }
+    .token-list {
+      max-height: 200px;
+      overflow-y: auto;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      margin-top: 8px;
+      display: none;
+    }
+    .token-list.show { display: block; }
+    .token-option {
+      padding: 12px;
+      cursor: pointer;
+      border-bottom: 1px solid #333;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    .token-option:hover { background: #333; }
+    .token-option:last-child { border-bottom: none; }
+    .metamask-helper {
+      background: #1e3a8a;
+      border: 1px solid #3B82F6;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 8px;
+      display: none;
+    }
+    .metamask-helper.show { display: block; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍐 PEARS Swap V3</h1>
+
+    <div class="swap-box">
+      <div class="v3-badge">
+        🎯 Multi-Token Swap - Swap any Base network token
+      </div>
+
+      <!-- From Token -->
+      <div class="token-row">
+        <div style="flex: 1;">
+          <select id="fromTokenSelect" class="token-selector" onchange="selectFromToken()">
+            <option value="">Select Token</option>
+            <option value="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE">ETH</option>
+            <option value="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913">USDC</option>
+            <option value="0x4200000000000000000000000000000000000006">WETH</option>
+            <option value="0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22">cbETH</option>
+            <option value="0xcbb7C0000aB88B473b1f5aFd9ef808440eed33Bf">cbBTC</option>
+            <option value="0x940181a94A35A4569E4529A3CDfB74e38FD98631">AERO</option>
+            <option value="0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed">DEGEN</option>
+            <option value="0xA219439258ca9da29E9Cc4cE5596924745e12B93">ZORA</option>
+            <option value="CUSTOM">+ Add Custom Token</option>
+          </select>
+          <div class="custom-token" id="fromCustomToken" style="display: none;">
+            <input type="text" id="fromCustomAddress" placeholder="0x..." />
+            <button class="add-token-btn" onclick="addCustomFromToken()">Add</button>
+          </div>
+          <div class="balance-display" id="fromBalance" onclick="useMaxBalance('from')"></div>
+          <div class="price-display" id="fromPrice"></div>
+        </div>
+        <input type="text" id="fromAmount" class="amount-input" placeholder="0.0" onchange="updateQuote()" oninput="debounceQuote()" />
+      </div>
+
+      <!-- Flip Button -->
+      <div style="text-align: center; margin: 16px 0;">
+        <button class="flip-button" onclick="flipTokens()">↕</button>
+      </div>
+
+      <!-- To Token -->
+      <div class="token-row">
+        <div style="flex: 1;">
+          <select id="toTokenSelect" class="token-selector" onchange="selectToToken()">
+            <option value="">Select Token</option>
+            <option value="0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE">ETH</option>
+            <option value="0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913">USDC</option>
+            <option value="0x4200000000000000000000000000000000000006">WETH</option>
+            <option value="0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22">cbETH</option>
+            <option value="0xcbb7C0000aB88B473b1f5aFd9ef808440eed33Bf">cbBTC</option>
+            <option value="0x940181a94A35A4569E4529A3CDfB74e38FD98631">AERO</option>
+            <option value="0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed">DEGEN</option>
+            <option value="0xA219439258ca9da29E9Cc4cE5596924745e12B93">ZORA</option>
+            <option value="CUSTOM">+ Add Custom Token</option>
+          </select>
+          <div class="custom-token" id="toCustomToken" style="display: none;">
+            <input type="text" id="toCustomAddress" placeholder="0x..." />
+            <button class="add-token-btn" onclick="addCustomToToken()">Add</button>
+          </div>
+          <div class="balance-display" id="toBalance"></div>
+          <div class="price-display" id="toPrice"></div>
+        </div>
+        <input type="text" id="toAmount" class="amount-input" placeholder="0.0" readonly />
+      </div>
+
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <button id="swapBtn" onclick="executeSwap()" disabled>Swap Tokens</button>
+
+      <div id="metamaskHelper" class="metamask-helper">
+        💡 Look for the MetaMask popup or click the extension icon
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    // V3 Multi-Token Swap Interface
+
+    // Base ecosystem token data
+    const BASE_TOKENS = {
+      '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE': { symbol: 'ETH', name: 'Ethereum', decimals: 18 },
+      '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913': { symbol: 'USDC', name: 'USD Coin', decimals: 6 },
+      '0x4200000000000000000000000000000000000006': { symbol: 'WETH', name: 'Wrapped Ether', decimals: 18 },
+      '0x2Ae3F1Ec7F1F5012CFEab0185bfc7aa3cf0DEc22': { symbol: 'cbETH', name: 'Coinbase Wrapped Staked ETH', decimals: 18 },
+      '0xcbb7C0000aB88B473b1f5aFd9ef808440eed33Bf': { symbol: 'cbBTC', name: 'Coinbase Wrapped BTC', decimals: 8 },
+      '0x940181a94A35A4569E4529A3CDfB74e38FD98631': { symbol: 'AERO', name: 'Aerodrome', decimals: 18 },
+      '0x4ed4E862860beD51a9570b96d89aF5E1B0Efefed': { symbol: 'DEGEN', name: 'Degen', decimals: 18 },
+      '0xA219439258ca9da29E9Cc4cE5596924745e12B93': { symbol: 'ZORA', name: 'Zora', decimals: 18 }
+    };
+
+    // State
+    let provider = null;
+    let signer = null;
+    let userAddress = null;
+    let sessionTokens = { ...BASE_TOKENS }; // Session tokens include base + custom
+    let quoteDebounceTimer = null;
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.innerHTML = message; // Use innerHTML for better formatting
+      status.className = `status show ${type}`;
+    }
+
+    // Show user-friendly error with optional details
+    function showUserFriendlyError(friendlyMessage, technicalDetails) {
+      const status = document.getElementById('status');
+
+      status.innerHTML = `
+        <div style="margin-bottom: 8px;">${friendlyMessage}</div>
+        <div style="font-size: 12px; opacity: 0.8;">
+          <span id="errorToggle" style="cursor: pointer; text-decoration: underline;" onclick="toggleErrorDetails()">
+            View technical details
+          </span>
+        </div>
+        <div id="errorDetails" style="display: none; font-size: 11px; margin-top: 8px; padding: 8px; background: rgba(0,0,0,0.3); border-radius: 4px; word-break: break-all;">
+          ${technicalDetails}
+        </div>
+      `;
+
+      status.className = 'status show error';
+    }
+
+    // Toggle error details visibility
+    function toggleErrorDetails() {
+      const details = document.getElementById('errorDetails');
+      const toggle = document.getElementById('errorToggle');
+
+      if (details.style.display === 'none') {
+        details.style.display = 'block';
+        toggle.textContent = 'Hide technical details';
+      } else {
+        details.style.display = 'none';
+        toggle.textContent = 'View technical details';
+      }
+    }
+
+    // Debounce quote updates for smooth typing
+    function debounceQuote() {
+      if (quoteDebounceTimer) clearTimeout(quoteDebounceTimer);
+      quoteDebounceTimer = setTimeout(updateQuote, 500);
+    }
+
+    // Connect wallet - NO auto-requests
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          showStatus('Please install MetaMask', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('connectBtn');
+        btn.textContent = 'Connecting...';
+        btn.disabled = true;
+
+        // Switch to Base
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x2105',
+                chainName: 'Base',
+                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                rpcUrls: ['https://omniscient-long-borough.base-mainnet.quiknode.pro/106c408fac18c1e8edc97692049248af9734aaef/'],
+                blockExplorerUrls: ['https://basescan.org']
+              }]
+            });
+          }
+        }
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send('eth_requestAccounts', []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        btn.textContent = 'Connected';
+        document.getElementById('swapBtn').disabled = false;
+
+        showStatus(`Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`, 'success');
+
+        // Load balances for connected tokens
+        await updateBalances();
+
+      } catch (error) {
+        showStatus('Connection failed', 'error');
+        document.getElementById('connectBtn').textContent = 'Connect Wallet';
+        document.getElementById('connectBtn').disabled = false;
+      }
+    }
+
+    // Update balances for all tokens
+    async function updateBalances() {
+      if (!provider || !userAddress) return;
+
+      const fromToken = document.getElementById('fromTokenSelect').value;
+      const toToken = document.getElementById('toTokenSelect').value;
+
+      if (fromToken && fromToken !== 'CUSTOM') {
+        const balance = await getTokenBalance(fromToken);
+        const symbol = sessionTokens[fromToken]?.symbol || 'TOKEN';
+        document.getElementById('fromBalance').textContent = `Balance: ${balance} ${symbol} (click to use max)`;
+        document.getElementById('fromBalance').dataset.balance = balance;
+      }
+
+      if (toToken && toToken !== 'CUSTOM') {
+        const balance = await getTokenBalance(toToken);
+        const symbol = sessionTokens[toToken]?.symbol || 'TOKEN';
+        document.getElementById('toBalance').textContent = `Balance: ${balance} ${symbol}`;
+      }
+    }
+
+    // Use max balance when clicking on balance
+    function useMaxBalance(side) {
+      const balanceDiv = document.getElementById(`${side}Balance`);
+      const balance = balanceDiv.dataset.balance;
+
+      if (balance && side === 'from') {
+        // Leave some ETH for gas if selling ETH
+        const fromToken = document.getElementById('fromTokenSelect').value;
+        if (fromToken.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+          // Keep 0.001 ETH for gas
+          const maxAmount = Math.max(0, parseFloat(balance) - 0.001);
+          document.getElementById('fromAmount').value = maxAmount.toFixed(6);
+        } else {
+          document.getElementById('fromAmount').value = balance;
+        }
+        updateQuote();
+      }
+    }
+
+    // Get token balance
+    async function getTokenBalance(tokenAddress) {
+      if (!provider || !userAddress) return '0';
+
+      try {
+        if (tokenAddress.toLowerCase() === '0xeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee') {
+          // ETH balance
+          const balance = await provider.getBalance(userAddress);
+          return parseFloat(ethers.formatEther(balance)).toFixed(4);
+        } else {
+          // ERC20 token balance
+          const tokenContract = new ethers.Contract(
+            tokenAddress,
+            ['function balanceOf(address) view returns (uint256)', 'function decimals() view returns (uint8)'],
+            provider
+          );
+          const balance = await tokenContract.balanceOf(userAddress);
+          const decimals = await tokenContract.decimals();
+          return parseFloat(ethers.formatUnits(balance, decimals)).toFixed(4);
+        }
+      } catch (error) {
+        console.error('Balance fetch error:', error);
+        return '0';
+      }
+    }
+
+    // Get live token price
+    async function getTokenPrice(tokenAddress) {
+      try {
+        const response = await fetch(`/api/v3-price/${tokenAddress}`);
+        if (response.ok) {
+          const data = await response.json();
+          return parseFloat(data.price) / 1000000; // Convert from USDC units
+        }
+      } catch (error) {
+        console.error('Price fetch error:', error);
+      }
+      return null;
+    }
+
+    // Handle from token selection
+    async function selectFromToken() {
+      const select = document.getElementById('fromTokenSelect');
+      const customDiv = document.getElementById('fromCustomToken');
+
+      if (select.value === 'CUSTOM') {
+        customDiv.style.display = 'flex';
+      } else {
+        customDiv.style.display = 'none';
+        if (select.value) {
+          await updateBalances();
+          await updatePrices();
+        }
+      }
+      updateQuote();
+    }
+
+    // Handle to token selection
+    async function selectToToken() {
+      const select = document.getElementById('toTokenSelect');
+      const customDiv = document.getElementById('toCustomToken');
+
+      if (select.value === 'CUSTOM') {
+        customDiv.style.display = 'flex';
+      } else {
+        customDiv.style.display = 'none';
+        if (select.value) {
+          await updateBalances();
+          await updatePrices();
+        }
+      }
+      updateQuote();
+    }
+
+    // Add custom from token
+    async function addCustomFromToken() {
+      const address = document.getElementById('fromCustomAddress').value.trim();
+      if (!address) return;
+
+      try {
+        showStatus('Validating token...', 'loading');
+        const response = await fetch(`/api/v3-token/${address}`);
+        const data = await response.json();
+
+        if (data.valid && data.tradeable) {
+          // Add to session tokens
+          sessionTokens[address] = { symbol: 'CUSTOM', name: 'Custom Token', decimals: 18 };
+
+          // Add to select and select it
+          const select = document.getElementById('fromTokenSelect');
+          const option = new Option(`CUSTOM (${address.slice(0, 6)}...)`, address);
+          select.insertBefore(option, select.lastElementChild); // Before "Add Custom"
+          select.value = address;
+
+          document.getElementById('fromCustomToken').style.display = 'none';
+          document.getElementById('fromCustomAddress').value = '';
+
+          showStatus('Custom token added successfully', 'success');
+          await updateBalances();
+          await updatePrices();
+        } else {
+          showStatus('Token not supported for trading', 'error');
+        }
+      } catch (error) {
+        showStatus('Invalid token address', 'error');
+      }
+    }
+
+    // Add custom to token
+    async function addCustomToToken() {
+      const address = document.getElementById('toCustomAddress').value.trim();
+      if (!address) return;
+
+      try {
+        showStatus('Validating token...', 'loading');
+        const response = await fetch(`/api/v3-token/${address}`);
+        const data = await response.json();
+
+        if (data.valid && data.tradeable) {
+          // Add to session tokens
+          sessionTokens[address] = { symbol: 'CUSTOM', name: 'Custom Token', decimals: 18 };
+
+          // Add to select and select it
+          const select = document.getElementById('toTokenSelect');
+          const option = new Option(`CUSTOM (${address.slice(0, 6)}...)`, address);
+          select.insertBefore(option, select.lastElementChild); // Before "Add Custom"
+          select.value = address;
+
+          document.getElementById('toCustomToken').style.display = 'none';
+          document.getElementById('toCustomAddress').value = '';
+
+          showStatus('Custom token added successfully', 'success');
+          await updateBalances();
+          await updatePrices();
+        } else {
+          showStatus('Token not supported for trading', 'error');
+        }
+      } catch (error) {
+        showStatus('Invalid token address', 'error');
+      }
+    }
+
+    // Update live prices
+    async function updatePrices() {
+      const fromToken = document.getElementById('fromTokenSelect').value;
+      const toToken = document.getElementById('toTokenSelect').value;
+
+      if (fromToken && fromToken !== 'CUSTOM') {
+        const price = await getTokenPrice(fromToken);
+        if (price) {
+          document.getElementById('fromPrice').textContent = `≈ $${price.toFixed(4)}`;
+        }
+      }
+
+      if (toToken && toToken !== 'CUSTOM') {
+        const price = await getTokenPrice(toToken);
+        if (price) {
+          document.getElementById('toPrice').textContent = `≈ $${price.toFixed(4)}`;
+        }
+      }
+    }
+
+    // Flip tokens
+    function flipTokens() {
+      const fromSelect = document.getElementById('fromTokenSelect');
+      const toSelect = document.getElementById('toTokenSelect');
+      const fromAmount = document.getElementById('fromAmount');
+      const toAmount = document.getElementById('toAmount');
+
+      // Swap the selected values
+      const tempValue = fromSelect.value;
+      fromSelect.value = toSelect.value;
+      toSelect.value = tempValue;
+
+      // Swap amounts
+      const tempAmount = fromAmount.value;
+      fromAmount.value = toAmount.value;
+      toAmount.value = tempAmount;
+
+      // Update UI
+      selectFromToken();
+      selectToToken();
+      updateQuote();
+    }
+
+    // Update quote when amount changes
+    async function updateQuote() {
+      const fromToken = document.getElementById('fromTokenSelect').value;
+      const toToken = document.getElementById('toTokenSelect').value;
+      const fromAmount = document.getElementById('fromAmount').value;
+
+      if (!fromToken || !toToken || !fromAmount || fromToken === 'CUSTOM' || toToken === 'CUSTOM') {
+        document.getElementById('toAmount').value = '';
+        return;
+      }
+
+      if (fromToken === toToken) {
+        document.getElementById('toAmount').value = fromAmount;
+        return;
+      }
+
+      try {
+        // Live quote estimation using 0x price endpoint
+        document.getElementById('toAmount').value = 'Loading...';
+
+        const tokenInfo = sessionTokens[fromToken];
+        const decimals = tokenInfo ? tokenInfo.decimals : 18;
+        const sellAmount = ethers.parseUnits(fromAmount, decimals).toString();
+
+        const response = await fetch('/api/v3-quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellToken: fromToken,
+            buyToken: toToken,
+            sellAmount: sellAmount,
+            taker: userAddress || '0x0000000000000000000000000000000000000000'
+          })
+        });
+
+        if (response.ok) {
+          const quoteData = await response.json();
+          const toTokenInfo = sessionTokens[toToken];
+          const toDecimals = toTokenInfo ? toTokenInfo.decimals : 18;
+          const buyAmount = ethers.formatUnits(quoteData.buyAmount, toDecimals);
+          document.getElementById('toAmount').value = parseFloat(buyAmount).toFixed(6);
+        } else {
+          document.getElementById('toAmount').value = '0';
+        }
+
+      } catch (error) {
+        console.error('Quote error:', error);
+        document.getElementById('toAmount').value = '0';
+      }
+    }
+
+    // Execute multi-token swap
+    async function executeSwap() {
+      if (!signer || !userAddress) {
+        showStatus('Please connect wallet first', 'error');
+        return;
+      }
+
+      const fromToken = document.getElementById('fromTokenSelect').value;
+      const toToken = document.getElementById('toTokenSelect').value;
+      const fromAmount = document.getElementById('fromAmount').value;
+
+      if (!fromToken || !toToken || !fromAmount) {
+        showStatus('Please select tokens and enter amount', 'error');
+        return;
+      }
+
+      if (fromToken === toToken) {
+        showStatus('Cannot swap same token', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('swapBtn');
+      const helper = document.getElementById('metamaskHelper');
+
+      try {
+        // Step 1: Get fresh quote for any token pair
+        btn.textContent = 'Getting Quote...';
+        btn.classList.add('sending');
+        btn.disabled = true;
+        showStatus('🔄 Getting fresh quote...', 'loading');
+
+        const tokenInfo = sessionTokens[fromToken];
+        const decimals = tokenInfo ? tokenInfo.decimals : 18;
+        const sellAmount = ethers.parseUnits(fromAmount, decimals).toString();
+
+        const response = await fetch('/api/v3-quote', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellToken: fromToken,
+            buyToken: toToken,
+            sellAmount: sellAmount,
+            taker: userAddress
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to get quote');
+
+        const swapData = await response.json();
+        console.log(`✅ V3 Quote: ${fromAmount} ${sessionTokens[fromToken]?.symbol} → ${ethers.formatUnits(swapData.buyAmount, sessionTokens[toToken]?.decimals || 18)} ${sessionTokens[toToken]?.symbol}`);
+
+        // Step 2: Execute transaction
+        btn.textContent = 'Sending to wallet...';
+        helper.classList.add('show');
+        showStatus('📱 Check MetaMask for approval...', 'loading');
+
+        const txParams = {
+          to: swapData.to,
+          data: swapData.data,
+          value: BigInt(swapData.value || '0')
+        };
+
+        // Estimate gas
+        const gasEstimate = await provider.estimateGas({
+          ...txParams,
+          from: userAddress
+        });
+
+        // Send transaction
+        btn.textContent = 'Broadcasting...';
+        const tx = await signer.sendTransaction({
+          ...txParams,
+          gasLimit: gasEstimate
+        });
+
+        helper.classList.remove('show');
+        showStatus(`✅ Swap submitted! ${tx.hash.slice(0, 10)}...`, 'success');
+
+        // Wait for confirmation
+        btn.textContent = 'Confirming...';
+        const receipt = await tx.wait();
+
+        if (receipt.status === 1) {
+          showStatus('✅ Multi-token swap completed!', 'success');
+
+          // Update balances
+          await updateBalances();
+
+          // Reset button
+          btn.textContent = 'Swap Tokens';
+          btn.classList.remove('sending');
+          btn.disabled = false;
+
+          // Open explorer
+          setTimeout(() => {
+            window.open(`https://basescan.org/tx/${tx.hash}`, '_blank');
+          }, 2000);
+        } else {
+          throw new Error('Transaction failed');
+        }
+
+      } catch (error) {
+        console.error('Swap failed:', error.message);
+
+        // User-friendly error handling
+        if (error.message.includes('user rejected')) {
+          showStatus('❌ Transaction cancelled by user', 'warning');
+        } else if (error.message.includes('insufficient funds') || error.message.includes('insufficient balance')) {
+          showStatus('❌ Insufficient balance for this swap', 'error');
+        } else if (error.message.includes('transaction execution reverted') || error.message.includes('CALL_EXCEPTION')) {
+          showUserFriendlyError('Transaction failed - this happens sometimes in DeFi. Please try again!', error.message);
+        } else if (error.message.includes('Failed to get quote') || error.message.includes('quote failed')) {
+          showStatus('❌ Unable to get price quote. Please try again.', 'error');
+        } else {
+          // Generic friendly error for anything else
+          showUserFriendlyError('Something went wrong. Please try again!', error.message);
+        }
+
+        // Reset button
+        btn.textContent = 'Swap Tokens';
+        btn.classList.remove('sending');
+        btn.disabled = false;
+        helper.classList.remove('show');
+      }
+    }
+
+    // Set default tokens
+    document.getElementById('fromTokenSelect').value = '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE'; // ETH
+    document.getElementById('toTokenSelect').value = '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913'; // USDC
+    document.getElementById('fromAmount').value = '0.005';
+
+    // Cost-optimized design - only makes requests when needed
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          userAddress = null;
+          document.getElementById('connectBtn').textContent = 'Connect Wallet';
+          document.getElementById('connectBtn').disabled = false;
+          document.getElementById('swapBtn').disabled = true;
+          showStatus('Wallet disconnected', 'warning');
+        } else if (accounts[0] !== userAddress) {
+          connectWallet();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

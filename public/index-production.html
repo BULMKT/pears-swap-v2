@@ -1,0 +1,315 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEARS Swap - Production</title>
+
+  <!-- DNS Prefetch ONLY (no auto-connections) -->
+  <link rel="dns-prefetch" href="https://api.0x.org">
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .swap-box {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4F46E5;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      background: #4F46E5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      position: relative;
+    }
+    button:hover { background: #4338CA; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    button.sending {
+      background: #059669;
+      animation: pulse 1s infinite;
+    }
+
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.8; }
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.success { background: #065f46; border: 1px solid #10B981; }
+    .status.error { background: #7f1d1d; border: 1px solid #EF4444; }
+    .status.loading { background: #1e3a8a; border: 1px solid #3B82F6; }
+    .status.warning { background: #854d0e; border: 1px solid #F59E0B; }
+
+    .metamask-helper {
+      background: #1e3a8a;
+      border: 1px solid #3B82F6;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 8px;
+      display: none;
+    }
+    .metamask-helper.show { display: block; }
+
+    .cost-info {
+      background: #065f46;
+      border: 1px solid #10B981;
+      padding: 12px;
+      border-radius: 8px;
+      margin-bottom: 16px;
+      font-size: 14px;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍐 PEARS Swap</h1>
+
+    <div class="swap-box">
+      <div class="cost-info">
+        ✅ Cost Optimized - Only makes requests when you swap
+      </div>
+
+      <input type="text" id="amountInput" placeholder="0.005" value="0.005" />
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <button id="swapBtn" onclick="executeSwap()" disabled>Swap ETH → USDC</button>
+
+      <div id="metamaskHelper" class="metamask-helper">
+        💡 Look for the MetaMask popup or click the extension icon
+      </div>
+
+      <div id="status" class="status"></div>
+    </div>
+  </div>
+
+  <script>
+    // PRODUCTION VERSION: Zero auto-requests, only on-demand
+
+    // State
+    let provider = null;
+    let signer = null;
+    let userAddress = null;
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status show ${type}`;
+    }
+
+    // Connect wallet - NO auto-requests
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          showStatus('Please install MetaMask', 'error');
+          return;
+        }
+
+        const btn = document.getElementById('connectBtn');
+        btn.textContent = 'Connecting...';
+        btn.disabled = true;
+
+        // Switch to Base
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x2105',
+                chainName: 'Base',
+                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                rpcUrls: ['https://omniscient-long-borough.base-mainnet.quiknode.pro/106c408fac18c1e8edc97692049248af9734aaef/'],
+                blockExplorerUrls: ['https://basescan.org']
+              }]
+            });
+          }
+        }
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send('eth_requestAccounts', []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        btn.textContent = 'Connected';
+        document.getElementById('swapBtn').disabled = false;
+
+        showStatus(`Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`, 'success');
+
+        // NO auto-fetching quotes - save costs!
+
+      } catch (error) {
+        showStatus('Connection failed', 'error');
+        document.getElementById('connectBtn').textContent = 'Connect Wallet';
+        document.getElementById('connectBtn').disabled = false;
+      }
+    }
+
+    // Execute swap - ONLY makes requests when needed
+    async function executeSwap() {
+      if (!signer || !userAddress) {
+        showStatus('Please connect wallet first', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('swapBtn');
+      const helper = document.getElementById('metamaskHelper');
+
+      try {
+        // Step 1: Get fresh quote ONLY when swapping
+        btn.textContent = 'Getting Quote...';
+        btn.classList.add('sending');
+        btn.disabled = true;
+        showStatus('🔄 Getting fresh quote...', 'loading');
+
+        const amount = document.getElementById('amountInput').value || '0.005';
+        const sellAmount = ethers.parseEther(amount).toString();
+
+        const response = await fetch('/api/fresh-swap-phase2', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellAmount: sellAmount,
+            taker: userAddress
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to get quote');
+
+        const swapData = await response.json();
+        console.log(`✅ Quote obtained: ${swapData.buyAmount} USDC`);
+
+        // Step 2: Execute transaction
+        btn.textContent = 'Sending to wallet...';
+        helper.classList.add('show');
+        showStatus('📱 Check MetaMask for approval...', 'loading');
+
+        const txParams = {
+          to: swapData.to,
+          data: swapData.data,
+          value: BigInt(swapData.value || '0')
+        };
+
+        // Estimate gas
+        const gasEstimate = await provider.estimateGas({
+          ...txParams,
+          from: userAddress
+        });
+
+        // Send transaction
+        btn.textContent = 'Broadcasting...';
+        const tx = await signer.sendTransaction({
+          ...txParams,
+          gasLimit: gasEstimate
+        });
+
+        helper.classList.remove('show');
+        showStatus(`✅ Swap submitted! ${tx.hash.slice(0, 10)}...`, 'success');
+
+        // Wait for confirmation
+        btn.textContent = 'Confirming...';
+        const receipt = await tx.wait();
+
+        if (receipt.status === 1) {
+          showStatus('✅ Swap completed successfully!', 'success');
+
+          // Reset button
+          btn.textContent = 'Swap ETH → USDC';
+          btn.classList.remove('sending');
+          btn.disabled = false;
+
+          // Open explorer
+          setTimeout(() => {
+            window.open(`https://basescan.org/tx/${tx.hash}`, '_blank');
+          }, 2000);
+        } else {
+          throw new Error('Transaction failed');
+        }
+
+      } catch (error) {
+        console.error('Swap failed:', error.message);
+
+        if (error.message.includes('user rejected')) {
+          showStatus('Transaction cancelled by user', 'warning');
+        } else if (error.message.includes('insufficient funds')) {
+          showStatus('Insufficient ETH balance', 'error');
+        } else {
+          showStatus(`Failed: ${error.message}`, 'error');
+        }
+
+        // Reset button
+        btn.textContent = 'Swap ETH → USDC';
+        btn.classList.remove('sending');
+        btn.disabled = false;
+        helper.classList.remove('show');
+      }
+    }
+
+    // NO auto-connections, NO warming, NO WebSocket, NO auto-refresh!
+    // Only makes requests when user clicks buttons
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          userAddress = null;
+          document.getElementById('connectBtn').textContent = 'Connect Wallet';
+          document.getElementById('connectBtn').disabled = false;
+          document.getElementById('swapBtn').disabled = true;
+          showStatus('Wallet disconnected', 'warning');
+        } else if (accounts[0] !== userAddress) {
+          connectWallet();
+        }
+      });
+    }
+  </script>
+</body>
+</html>

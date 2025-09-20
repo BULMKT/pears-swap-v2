@@ -1,0 +1,622 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PEARS Swap V2 - Phase 2 Flashblocks</title>
+
+  <!-- DNS Prefetch & Preconnect for Speed -->
+  <link rel="dns-prefetch" href="https://api.0x.org">
+  <link rel="preconnect" href="https://api.0x.org" crossorigin>
+  <link rel="dns-prefetch" href="https://omniscient-long-borough.base-mainnet.quiknode.pro">
+  <link rel="preconnect" href="https://omniscient-long-borough.base-mainnet.quiknode.pro">
+
+  <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: #000;
+      color: #fff;
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .container {
+      width: 100%;
+      max-width: 600px;
+      padding: 20px;
+    }
+    .swap-box {
+      background: #111;
+      border: 2px solid #333;
+      border-radius: 16px;
+      padding: 24px;
+      margin-bottom: 20px;
+    }
+    h1 {
+      text-align: center;
+      margin-bottom: 30px;
+      color: #4F46E5;
+    }
+    .phase-badge {
+      text-align: center;
+      background: #059669;
+      color: white;
+      padding: 4px 12px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-bottom: 20px;
+    }
+    input {
+      width: 100%;
+      padding: 16px;
+      font-size: 18px;
+      background: #222;
+      border: 1px solid #444;
+      border-radius: 8px;
+      color: #fff;
+      margin-bottom: 16px;
+    }
+    button {
+      width: 100%;
+      padding: 16px;
+      font-size: 16px;
+      background: #4F46E5;
+      color: white;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      margin-bottom: 12px;
+      position: relative;
+      overflow: hidden;
+    }
+    button:hover { background: #4338CA; }
+    button:disabled { opacity: 0.5; cursor: not-allowed; }
+
+    /* Phase 2 Optimistic UI States */
+    button.sending {
+      background: #059669;
+      animation: flashblocks-pulse 0.2s infinite;
+    }
+
+    @keyframes flashblocks-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.9; }
+    }
+
+    .status {
+      padding: 12px;
+      border-radius: 8px;
+      margin-top: 12px;
+      display: none;
+    }
+    .status.show { display: block; }
+    .status.success { background: #065f46; border: 1px solid #10B981; }
+    .status.error { background: #7f1d1d; border: 1px solid #EF4444; }
+    .status.loading { background: #1e3a8a; border: 1px solid #3B82F6; }
+    .status.warning { background: #854d0e; border: 1px solid #F59E0B; }
+    .status.flashblocks { background: #065f46; border: 1px solid #10B981; }
+
+    .debug {
+      background: #333;
+      padding: 12px;
+      border-radius: 8px;
+      font-family: monospace;
+      font-size: 12px;
+      margin-top: 12px;
+      max-height: 300px;
+      overflow-y: auto;
+    }
+
+    .performance-metrics {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin-top: 12px;
+      padding: 12px;
+      background: #1a1a1a;
+      border-radius: 8px;
+      font-size: 14px;
+      color: #888;
+    }
+
+    .metric {
+      text-align: center;
+    }
+    .metric-value {
+      font-size: 16px;
+      color: #4F46E5;
+      font-weight: bold;
+    }
+    .metric-value.flashblocks {
+      color: #10B981;
+    }
+
+    .metamask-helper {
+      background: #1e3a8a;
+      border: 1px solid #3B82F6;
+      padding: 8px;
+      border-radius: 6px;
+      font-size: 14px;
+      margin-top: 8px;
+      display: none;
+    }
+    .metamask-helper.show { display: block; }
+
+    .websocket-status {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin-bottom: 12px;
+      font-size: 12px;
+      color: #888;
+    }
+    .ws-indicator {
+      width: 8px;
+      height: 8px;
+      border-radius: 50%;
+      margin-right: 6px;
+      background: #EF4444;
+    }
+    .ws-indicator.connected {
+      background: #10B981;
+      animation: ws-pulse 2s infinite;
+    }
+
+    @keyframes ws-pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.6; }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>🍐 PEARS V2 - Phase 2</h1>
+    <div class="phase-badge">⚡ FLASHBLOCKS ENABLED - 200ms Confirmations</div>
+
+    <div class="swap-box">
+      <div class="websocket-status">
+        <div id="wsIndicator" class="ws-indicator"></div>
+        <span id="wsStatus">Connecting to WebSocket...</span>
+      </div>
+
+      <input type="text" id="amountInput" placeholder="0.005" value="0.005" />
+      <button id="connectBtn" onclick="connectWallet()">Connect Wallet</button>
+      <button id="swapBtn" onclick="executeSwap()" disabled>Swap ETH → USDC</button>
+
+      <div id="metamaskHelper" class="metamask-helper">
+        💡 Look for the MetaMask popup or click the extension icon
+      </div>
+
+      <div id="status" class="status"></div>
+
+      <div class="performance-metrics">
+        <div class="metric">
+          <div>Quote Age</div>
+          <div class="metric-value" id="quoteAge">--</div>
+        </div>
+        <div class="metric">
+          <div>API Speed</div>
+          <div class="metric-value" id="speed">--</div>
+        </div>
+        <div class="metric">
+          <div>Flashblocks</div>
+          <div class="metric-value flashblocks" id="flashblocksStatus">Ready</div>
+        </div>
+        <div class="metric">
+          <div>Status</div>
+          <div class="metric-value" id="txStatus">Ready</div>
+        </div>
+      </div>
+
+      <div id="debug" class="debug"></div>
+    </div>
+  </div>
+
+  <script>
+    // PHASE 2: FLASHBLOCKS + WEBSOCKET OPTIMIZATIONS
+
+    // Configuration
+    const QUOTE_TTL = 8000; // 8 seconds (faster refresh for Flashblocks)
+    const API_ENDPOINT = '/api/fresh-swap-phase2';
+    const QUICKNODE_WS = 'wss://omniscient-long-borough.base-mainnet.quiknode.pro/106c408fac18c1e8edc97692049248af9734aaef/';
+
+    // State
+    let provider = null;
+    let signer = null;
+    let userAddress = null;
+    let currentQuote = null;
+    let quoteTimestamp = null;
+    let performanceStart = null;
+    let wsProvider = null;
+    let wsConnected = false;
+
+    // Performance tracking
+    const metrics = {
+      quoteTime: 0,
+      walletTime: 0,
+      flashblocksTime: 0,
+      confirmationTime: 0
+    };
+
+    function log(message) {
+      const debug = document.getElementById('debug');
+      const time = new Date().toLocaleTimeString();
+      debug.innerHTML += `${time}: ${message}\n`;
+      debug.scrollTop = debug.scrollHeight;
+      console.log(`[PEARS-PHASE2] ${message}`);
+    }
+
+    function showStatus(message, type) {
+      const status = document.getElementById('status');
+      status.textContent = message;
+      status.className = `status show ${type}`;
+    }
+
+    function updateMetrics(quoteAge, speed, flashblocks, status) {
+      if (quoteAge !== undefined) document.getElementById('quoteAge').textContent = quoteAge;
+      if (speed !== undefined) document.getElementById('speed').textContent = speed;
+      if (flashblocks !== undefined) document.getElementById('flashblocksStatus').textContent = flashblocks;
+      if (status !== undefined) document.getElementById('txStatus').textContent = status;
+    }
+
+    // WebSocket connection for real-time updates
+    async function initWebSocket() {
+      try {
+        log('🔌 Connecting to QuickNode WebSocket...');
+        wsProvider = new ethers.WebSocketProvider(QUICKNODE_WS);
+
+        wsProvider.on('connect', () => {
+          wsConnected = true;
+          log('✅ WebSocket connected - Real-time updates enabled');
+          document.getElementById('wsIndicator').classList.add('connected');
+          document.getElementById('wsStatus').textContent = 'WebSocket Connected';
+          updateMetrics('--', '--', 'Connected', 'Ready');
+        });
+
+        wsProvider.on('disconnect', () => {
+          wsConnected = false;
+          log('❌ WebSocket disconnected');
+          document.getElementById('wsIndicator').classList.remove('connected');
+          document.getElementById('wsStatus').textContent = 'WebSocket Disconnected';
+        });
+
+        // Listen for new blocks (Flashblocks updates every 200ms)
+        wsProvider.on('block', (blockNumber) => {
+          log(`📦 New Flashblock: ${blockNumber} (200ms update)`);
+          updateMetrics('--', '--', 'Active', '--');
+        });
+
+      } catch (error) {
+        log(`⚠️ WebSocket setup failed: ${error.message}`);
+        document.getElementById('wsStatus').textContent = 'WebSocket Failed';
+      }
+    }
+
+    // Warm up connections on page load
+    async function warmConnections() {
+      log('🔥 Phase 2: Warming up connections...');
+      try {
+        // Warm HTTP connection
+        await fetch('/api/health');
+
+        // Initialize WebSocket
+        await initWebSocket();
+
+        log('✅ Phase 2 connection pool ready');
+      } catch (e) {
+        log(`⚠️ Connection warming failed: ${e.message}`);
+      }
+    }
+
+    // Connect wallet with Phase 2 optimizations
+    async function connectWallet() {
+      try {
+        if (!window.ethereum) {
+          showStatus('Please install MetaMask', 'error');
+          return;
+        }
+
+        performanceStart = Date.now();
+        log('🔗 Connecting to MetaMask...');
+
+        const btn = document.getElementById('connectBtn');
+        btn.textContent = 'Connecting...';
+        btn.disabled = true;
+
+        // Switch to Base with QuickNode RPC
+        try {
+          await window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{ chainId: '0x2105' }]
+          });
+        } catch (switchError) {
+          if (switchError.code === 4902) {
+            await window.ethereum.request({
+              method: 'wallet_addEthereumChain',
+              params: [{
+                chainId: '0x2105',
+                chainName: 'Base',
+                nativeCurrency: { name: 'Ether', symbol: 'ETH', decimals: 18 },
+                rpcUrls: ['https://omniscient-long-borough.base-mainnet.quiknode.pro/106c408fac18c1e8edc97692049248af9734aaef/'],
+                blockExplorerUrls: ['https://basescan.org']
+              }]
+            });
+          }
+        }
+
+        provider = new ethers.BrowserProvider(window.ethereum);
+        const accounts = await provider.send('eth_requestAccounts', []);
+        signer = await provider.getSigner();
+        userAddress = await signer.getAddress();
+
+        metrics.walletTime = Date.now() - performanceStart;
+        log(`✅ Connected in ${metrics.walletTime}ms: ${userAddress}`);
+
+        btn.textContent = 'Connected';
+        document.getElementById('swapBtn').disabled = false;
+
+        showStatus(`Connected: ${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`, 'success');
+        updateMetrics('Fresh', `${metrics.walletTime}ms`, wsConnected ? 'Ready' : 'Connecting', 'Connected');
+
+        // Pre-fetch initial quote after connection
+        prefetchQuote();
+
+      } catch (error) {
+        log(`❌ Connection failed: ${error.message}`);
+        showStatus('Connection failed', 'error');
+        document.getElementById('connectBtn').textContent = 'Connect Wallet';
+        document.getElementById('connectBtn').disabled = false;
+      }
+    }
+
+    // Pre-fetch quote for instant execution
+    async function prefetchQuote() {
+      if (!userAddress) return;
+
+      try {
+        const amount = document.getElementById('amountInput').value || '0.005';
+        const sellAmount = ethers.parseEther(amount).toString();
+
+        log('🔄 Pre-fetching quote with Flashblocks...');
+        const startTime = Date.now();
+
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellAmount: sellAmount,
+            taker: userAddress
+          })
+        });
+
+        if (response.ok) {
+          currentQuote = await response.json();
+          quoteTimestamp = Date.now();
+          const fetchTime = Date.now() - startTime;
+          log(`✅ Quote pre-cached in ${fetchTime}ms (Flashblocks-ready)`);
+          updateMetrics('Fresh', `${fetchTime}ms`, 'Ready', 'Ready');
+        }
+      } catch (error) {
+        log(`⚠️ Prefetch failed: ${error.message}`);
+      }
+    }
+
+    // Check if quote needs refresh (faster for Flashblocks)
+    async function ensureFreshQuote() {
+      const now = Date.now();
+      const quoteAge = quoteTimestamp ? now - quoteTimestamp : Infinity;
+
+      if (!currentQuote || quoteAge > QUOTE_TTL) {
+        log(`🔄 Quote stale (${Math.round(quoteAge/1000)}s old), refreshing for Flashblocks...`);
+        updateMetrics('Refreshing...', '--', 'Active', 'Updating');
+
+        const amount = document.getElementById('amountInput').value || '0.005';
+        const sellAmount = ethers.parseEther(amount).toString();
+
+        const response = await fetch(API_ENDPOINT, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            sellAmount: sellAmount,
+            taker: userAddress
+          })
+        });
+
+        if (!response.ok) throw new Error('Failed to get fresh quote');
+
+        currentQuote = await response.json();
+        quoteTimestamp = now;
+        log(`✅ Fresh quote obtained for Flashblocks`);
+      } else {
+        const ageSeconds = Math.round(quoteAge / 1000);
+        log(`✅ Using cached quote (${ageSeconds}s old) - Flashblocks ready`);
+        updateMetrics(`${ageSeconds}s`, '--', 'Ready', 'Cached');
+      }
+
+      return currentQuote;
+    }
+
+    // Execute swap with Flashblocks optimizations
+    async function executeSwap() {
+      if (!signer || !userAddress) {
+        showStatus('Please connect wallet first', 'error');
+        return;
+      }
+
+      const btn = document.getElementById('swapBtn');
+      const helper = document.getElementById('metamaskHelper');
+
+      try {
+        performanceStart = Date.now();
+
+        // PHASE 2 OPTIMISTIC UI - Faster animations for Flashblocks
+        btn.textContent = 'Preparing...';
+        btn.classList.add('sending');
+        btn.disabled = true;
+        showStatus('⚡ Preparing Flashblocks swap...', 'loading');
+        updateMetrics('--', '--', 'Preparing', 'Preparing');
+
+        // Step 1: Ensure fresh quote
+        const swapData = await ensureFreshQuote();
+        const quoteTime = Date.now() - performanceStart;
+        log(`✅ Quote ready in ${quoteTime}ms: ${swapData.buyAmount} USDC`);
+
+        // Step 2: Execute transaction with Flashblocks provider
+        btn.textContent = 'Sending to wallet...';
+        helper.classList.add('show');
+        showStatus('📱 Check MetaMask for approval...', 'loading');
+        updateMetrics('Fresh', `${quoteTime}ms`, 'Executing', 'Confirming');
+
+        const txParams = {
+          to: swapData.to,
+          data: swapData.data,
+          value: BigInt(swapData.value || '0')
+        };
+
+        const sendStart = Date.now();
+
+        // Estimate gas with Flashblocks
+        const gasEstimate = await provider.estimateGas({
+          ...txParams,
+          from: userAddress
+        });
+
+        log(`✅ Gas estimate: ${gasEstimate.toString()} (Flashblocks)`);
+
+        // Send transaction
+        btn.textContent = 'Broadcasting...';
+        const txPromise = signer.sendTransaction({
+          ...txParams,
+          gasLimit: gasEstimate
+        });
+
+        // OPTIMISTIC - Show success before actual confirmation
+        btn.textContent = 'Confirming on Flashblocks...';
+        showStatus('📡 Transaction broadcasting...', 'loading');
+
+        const tx = await txPromise;
+        const sendTime = Date.now() - sendStart;
+
+        helper.classList.remove('show');
+        log(`🎉 Transaction sent in ${sendTime}ms: ${tx.hash}`);
+        showStatus(`✅ Swap submitted! Flashblocks confirming...`, 'flashblocks');
+        updateMetrics('Fresh', `${sendTime}ms`, 'Confirming', 'Mining');
+
+        // Listen for Flashblocks updates if WebSocket is connected
+        if (wsConnected && wsProvider) {
+          log('👂 Listening for Flashblocks updates...');
+
+          const flashblocksStart = Date.now();
+          wsProvider.once(tx.hash, (receipt) => {
+            const flashblocksTime = Date.now() - flashblocksStart;
+            log(`⚡ Flashblocks update received in ${flashblocksTime}ms!`);
+            updateMetrics('Complete', `${Math.round(flashblocksTime)}ms`, 'Active', 'Confirming');
+          });
+        }
+
+        // Wait for final confirmation
+        const receipt = await tx.wait();
+        const totalTime = Date.now() - performanceStart;
+        metrics.confirmationTime = Date.now() - sendStart;
+
+        if (receipt.status === 1) {
+          log(`🎊 SUCCESS! Total time: ${totalTime}ms, Confirmation: ${metrics.confirmationTime}ms`);
+          log(`📊 Gas used: ${receipt.gasUsed.toString()}`);
+          showStatus('✅ Swap completed with Flashblocks!', 'success');
+          updateMetrics('Complete', `${Math.round(totalTime/1000)}s`, 'Success', 'Complete');
+
+          // Reset for next swap
+          btn.textContent = 'Swap ETH → USDC';
+          btn.classList.remove('sending');
+          btn.disabled = false;
+
+          // Pre-fetch next quote
+          setTimeout(prefetchQuote, 1000);
+
+          // Open explorer after 2s
+          setTimeout(() => {
+            window.open(`https://basescan.org/tx/${tx.hash}`, '_blank');
+          }, 2000);
+        } else {
+          throw new Error('Transaction failed');
+        }
+
+      } catch (error) {
+        const totalTime = Date.now() - performanceStart;
+        log(`❌ Swap failed after ${totalTime}ms: ${error.message}`);
+
+        // Handle specific errors
+        if (error.message.includes('user rejected')) {
+          showStatus('Transaction cancelled by user', 'warning');
+        } else if (error.message.includes('insufficient funds')) {
+          showStatus('Insufficient ETH balance', 'error');
+        } else {
+          showStatus(`Failed: ${error.message}`, 'error');
+        }
+
+        updateMetrics('--', '--', 'Failed', 'Failed');
+
+        // Reset button
+        btn.textContent = 'Swap ETH → USDC';
+        btn.classList.remove('sending');
+        btn.disabled = false;
+        helper.classList.remove('show');
+
+        // Try to prefetch a new quote for retry
+        setTimeout(prefetchQuote, 2000);
+      }
+    }
+
+    // Input change handler with debounced prefetch
+    let inputTimer = null;
+    document.addEventListener('DOMContentLoaded', () => {
+      const input = document.getElementById('amountInput');
+
+      input.addEventListener('input', (e) => {
+        clearTimeout(inputTimer);
+        // Faster debounce for Flashblocks (300ms vs 500ms)
+        inputTimer = setTimeout(() => {
+          if (userAddress) {
+            log('📝 Amount changed, updating quote for Flashblocks...');
+            prefetchQuote();
+          }
+        }, 300);
+      });
+
+      // Warm up connections on load
+      warmConnections();
+
+      // Auto-connect if available
+      if (window.ethereum) {
+        window.ethereum.request({ method: 'eth_accounts' }).then(accounts => {
+          if (accounts.length > 0) {
+            connectWallet();
+          }
+        });
+      }
+    });
+
+    // Listen for account changes
+    if (window.ethereum) {
+      window.ethereum.on('accountsChanged', (accounts) => {
+        if (accounts.length === 0) {
+          // User disconnected
+          userAddress = null;
+          currentQuote = null;
+          document.getElementById('connectBtn').textContent = 'Connect Wallet';
+          document.getElementById('connectBtn').disabled = false;
+          document.getElementById('swapBtn').disabled = true;
+          showStatus('Wallet disconnected', 'warning');
+        } else if (accounts[0] !== userAddress) {
+          // User switched accounts
+          connectWallet();
+        }
+      });
+    }
+  </script>
+</body>
+</html>
