@@ -127,7 +127,7 @@
         /* Main Content */
         .main-content {
             flex: 1;
-            display: flex;
+            display: flex-start;
             justify-content: center;
             align-items: center;
             padding: 40px 20px;
@@ -481,18 +481,40 @@
             font-size: 14px;
         }
 
+        /* Mobile Logo */
+        .mobile-logo-container {
+            display: none;
+            text-align: center;
+            padding: 24px 0 0 0;
+            margin-bottom: -20px;
+        }
+
+        .mobile-logo {
+            height: 200px;
+            margin-left: -55px;
+        }
+
         /* Mobile Responsive */
         @media (max-width: 768px) {
             .header {
                 padding: 16px 20px;
+                justify-content: center;
+                align-items: center;
             }
 
             .logo {
-                height: 60px;
+                display: none;
             }
 
             .header-right {
                 gap: 16px;
+                margin-top: 0;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .mobile-logo-container {
+                display: block;
             }
 
             .nav-link {
@@ -536,12 +558,17 @@
 
         <!-- Header -->
         <div class="header">
-            <img src="Logo Pears.png" alt="PEARS" class="logo">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
             <div class="header-right">
-                <a href="/test-design" class="nav-link active">Swap</a>
+                <a href="/" class="nav-link active">Swap</a>
                 <a href="/roadmap" class="nav-link">Roadmap</a>
                 <button class="connect-wallet not-connected" id="connectWallet">Connect Base Wallet</button>
             </div>
+        </div>
+
+        <!-- Mobile Logo -->
+        <div class="mobile-logo-container">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="mobile-logo"></a>
         </div>
 
         <!-- Main Content -->
