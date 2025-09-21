@@ -301,6 +301,11 @@ app.get('/terms', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'terms.html'));
 });
 
+// Serve technology page
+app.get('/technology', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'technology.html'));
+});
+
 // OPTIMIZED endpoint with keep-alive and performance improvements
 app.post('/api/fresh-swap-optimized', async (req, res) => {
   const startTime = Date.now();

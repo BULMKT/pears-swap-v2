@@ -1,0 +1,729 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Technology - PEARS</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(ellipse at top, #0f0f0f 0%, #000000 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(254, 116, 91, 0.1);
+        }
+
+        .header-right {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #FE745B;
+        }
+
+        .nav-link.active {
+            color: #FE745B;
+        }
+
+        .mobile-logo {
+            display: none;
+            margin: 40px auto 20px;
+            width: 180px;
+            height: auto;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 80px 20px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FE745B 0%, #FF9A85 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        .philosophy-pills {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 60px;
+        }
+
+        .pill {
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.3);
+            padding: 12px 24px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 600;
+            color: #FE745B;
+            animation: pulse 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.8; transform: scale(1); }
+            50% { opacity: 1; transform: scale(1.05); }
+        }
+
+        /* Technical Pillars Section */
+        .pillars {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+        }
+
+        .section-title {
+            text-align: center;
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 60px;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 24px;
+            margin-bottom: 80px;
+        }
+
+        .pillar-card {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pillar-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FE745B, transparent);
+            animation: slide 3s linear infinite;
+        }
+
+        @keyframes slide {
+            0% { transform: translateX(-100%); }
+            100% { transform: translateX(100%); }
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(254, 116, 91, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .pillar-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+        }
+
+        .pillar-title {
+            font-size: 24px;
+            font-weight: 700;
+            color: #FE745B;
+            margin-bottom: 16px;
+        }
+
+        .pillar-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .pillar-features {
+            list-style: none;
+        }
+
+        .pillar-features li {
+            color: rgba(255, 255, 255, 0.6);
+            padding-left: 20px;
+            position: relative;
+            margin-bottom: 8px;
+            font-size: 14px;
+        }
+
+        .pillar-features li::before {
+            content: '▸';
+            position: absolute;
+            left: 0;
+            color: #FE745B;
+        }
+
+        /* Performance Metrics */
+        .metrics {
+            background: linear-gradient(135deg, rgba(254, 116, 91, 0.05), transparent);
+            padding: 80px 20px;
+        }
+
+        .metrics-container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 40px;
+            text-align: center;
+        }
+
+        .metric-item {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .metric-value {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FE745B, #FF9A85);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 8px;
+        }
+
+        .metric-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Vision Section */
+        .vision {
+            max-width: 900px;
+            margin: 0 auto;
+            padding: 80px 20px;
+            text-align: center;
+        }
+
+        .vision-card {
+            background: rgba(254, 116, 91, 0.05);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 24px;
+            padding: 48px;
+            position: relative;
+        }
+
+        .vision-title {
+            font-size: 36px;
+            font-weight: 700;
+            margin-bottom: 24px;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .vision-text {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 18px;
+            line-height: 1.8;
+            margin-bottom: 32px;
+        }
+
+        .vision-highlight {
+            background: rgba(254, 116, 91, 0.1);
+            border-left: 3px solid #FE745B;
+            padding: 24px;
+            margin: 32px 0;
+            text-align: left;
+            border-radius: 0 12px 12px 0;
+        }
+
+        .vision-highlight h3 {
+            color: #FE745B;
+            margin-bottom: 12px;
+            font-size: 20px;
+        }
+
+        .vision-highlight p {
+            color: rgba(255, 255, 255, 0.7);
+            line-height: 1.6;
+        }
+
+        /* CTA Section */
+        .cta {
+            text-align: center;
+            padding: 60px 20px;
+            background: radial-gradient(ellipse at center, rgba(254, 116, 91, 0.1), transparent);
+        }
+
+        .cta-button {
+            display: inline-block;
+            background: linear-gradient(135deg, #FE745B, #FF6B4A);
+            color: white;
+            text-decoration: none;
+            padding: 16px 48px;
+            border-radius: 100px;
+            font-size: 18px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 20px rgba(254, 116, 91, 0.3);
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 30px rgba(254, 116, 91, 0.5);
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                justify-content: center;
+            }
+
+            .header-right {
+                gap: 20px;
+            }
+
+            .mobile-logo {
+                display: block;
+            }
+
+            .hero {
+                padding: 40px 20px;
+            }
+
+            .hero h1 {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 18px;
+            }
+
+            .section-title {
+                font-size: 36px;
+            }
+
+            .pillars-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .metrics-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 24px;
+            }
+
+            .metric-value {
+                font-size: 36px;
+            }
+
+            .vision-card {
+                padding: 32px 24px;
+            }
+
+            .vision-title {
+                font-size: 28px;
+            }
+
+            .vision-text {
+                font-size: 16px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .social-icons {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <div class="header-right">
+            <a href="/" class="nav-link">Swap</a>
+            <a href="/roadmap" class="nav-link">Roadmap</a>
+            <a href="/technology" class="nav-link active">Technology</a>
+            <a href="/terms" class="nav-link">Terms</a>
+        </div>
+    </div>
+
+    <!-- Mobile Logo -->
+    <a href="/"><img src="Logo Pears.png" alt="PEARS" class="mobile-logo"></a>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Built Different</h1>
+        <p class="hero-subtitle">Not just another DEX. A technical masterpiece.</p>
+
+        <div class="philosophy-pills">
+            <div class="pill">Simplicity</div>
+            <div class="pill">Perfection</div>
+            <div class="pill">Reliability</div>
+        </div>
+    </div>
+
+    <!-- Technical Pillars -->
+    <div class="pillars">
+        <h2 class="section-title">Technical Excellence</h2>
+
+        <div class="pillars-grid">
+            <div class="pillar-card">
+                <div class="pillar-icon">🏗️</div>
+                <h3 class="pillar-title">PEARS-PROTOCOL</h3>
+                <p class="pillar-description">
+                    Custom smart contracts built from scratch for Base optimization. No forks, no shortcuts.
+                </p>
+                <ul class="pillar-features">
+                    <li>Gas-optimized architecture</li>
+                    <li>Direct Uniswap v3 integration</li>
+                    <li>0.08% transparent fee system</li>
+                    <li>ReentrancyGuard protection</li>
+                </ul>
+            </div>
+
+            <div class="pillar-card">
+                <div class="pillar-icon">⚡</div>
+                <h3 class="pillar-title">Elite Architecture</h3>
+                <p class="pillar-description">
+                    Backend system engineered for millisecond execution and zero-failure tolerance.
+                </p>
+                <ul class="pillar-features">
+                    <li>HTTP Keep-Alive pooling</li>
+                    <li>Quote-and-execute protocol</li>
+                    <li>1.2s ultra-fast timeouts</li>
+                    <li>Smart quote caching</li>
+                </ul>
+            </div>
+
+            <div class="pillar-card">
+                <div class="pillar-icon">🎯</div>
+                <h3 class="pillar-title">Base Native</h3>
+                <p class="pillar-description">
+                    Not generic multi-chain. Purpose-built for Base ecosystem dominance.
+                </p>
+                <ul class="pillar-features">
+                    <li>Chain-specific optimizations</li>
+                    <li>Native ETH/WETH handling</li>
+                    <li>Base token curation</li>
+                    <li>Direct BaseScan integration</li>
+                </ul>
+            </div>
+
+            <div class="pillar-card">
+                <div class="pillar-icon">🛡️</div>
+                <h3 class="pillar-title">Never Fails</h3>
+                <p class="pillar-description">
+                    Multi-layer validation system that predicts and prevents transaction failures.
+                </p>
+                <ul class="pillar-features">
+                    <li>Proactive allowance checking</li>
+                    <li>Transaction simulation</li>
+                    <li>Dynamic gas calculation</li>
+                    <li>20+ error recovery paths</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <!-- Performance Metrics -->
+    <div class="metrics">
+        <div class="metrics-container">
+            <h2 class="section-title">By The Numbers</h2>
+
+            <div class="metrics-grid">
+                <div class="metric-item">
+                    <div class="metric-value">&lt;1.5s</div>
+                    <div class="metric-label">Quote Speed</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">0.08%</div>
+                    <div class="metric-label">Lowest Fees</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">99.9%</div>
+                    <div class="metric-label">Success Rate</div>
+                </div>
+                <div class="metric-item">
+                    <div class="metric-value">24/7</div>
+                    <div class="metric-label">Uptime</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Vision Section -->
+    <div class="vision">
+        <div class="vision-card">
+            <h2 class="vision-title">The PEARS Vision</h2>
+
+            <p class="vision-text">
+                While others chase features, we chase perfection. PEARS isn't trying to be everything to everyone. We're building the most reliable, fastest, and simplest swap experience in DeFi.
+            </p>
+
+            <div class="vision-highlight">
+                <h3>One Thing, Done Right</h3>
+                <p>
+                    The world doesn't need another DEX with 100 features that work okay. It needs one DEX that works perfectly, every time. That's PEARS.
+                </p>
+            </div>
+
+            <p class="vision-text">
+                Our architecture is built for the future - autonomous, decentralized, unstoppable. But we're starting with what matters most: becoming the swap platform you trust without thinking.
+            </p>
+
+            <div class="vision-highlight">
+                <h3>Built for Tomorrow</h3>
+                <p>
+                    Every line of code, every architectural decision, every optimization - it's all building toward full autonomy. Smart contracts that upgrade themselves. Systems that self-optimize. A protocol that evolves.
+                </p>
+            </div>
+        </div>
+    </div>
+
+    <!-- CTA Section -->
+    <div class="cta">
+        <h2 class="section-title">Experience The Difference</h2>
+        <a href="/" class="cta-button">Start Swapping</a>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-socials">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                    <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                    <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                    <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Learn</h3>
+                <div class="footer-links-list">
+                    <a href="/technology" class="footer-link">Technology</a>
+                    <a href="/roadmap" class="footer-link">Roadmap</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <span class="footer-link" onclick="showComingSoon()">Documentation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showComingSoon() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                border: 1px solid #333;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+                margin: 20px;
+            `;
+
+            modal.innerHTML = `
+                <h2 style="color: #ff6b35; margin-bottom: 20px; font-size: 24px;">Coming Soon!</h2>
+                <p style="color: #ccc; margin-bottom: 30px; line-height: 1.6;">
+                    This feature is currently under development. Stay tuned for updates!
+                </p>
+                <button onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                        style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 30px;
+                               border-radius: 25px;
+                               cursor: pointer;
+                               font-weight: 600;
+                               transition: transform 0.2s;
+                               font-size: 16px;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    Got it!
+                </button>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+
+        // Animate metrics on scroll
+        const observerOptions = {
+            threshold: 0.5
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.animation = 'fadeInUp 0.6s ease-out';
+                }
+            });
+        }, observerOptions);
+
+        document.querySelectorAll('.metric-item').forEach(item => {
+            observer.observe(item);
+        });
+    </script>
+</body>
+</html>
