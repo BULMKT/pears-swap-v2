@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy - PEARS</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(ellipse at top, #0f0f0f 0%, #000000 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(254, 116, 91, 0.1);
+        }
+
+        .logo {
+            height: 120px;
+            width: auto;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #FE745B;
+        }
+
+        .nav-link.active {
+            color: #FE745B;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 60px 40px;
+        }
+
+        .page-title {
+            font-size: 48px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FE745B 0%, #FF9A85 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+            text-align: center;
+        }
+
+        .last-updated {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            margin-bottom: 40px;
+            font-size: 14px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(254, 116, 91, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+        }
+
+        h2 {
+            color: #FE745B;
+            font-size: 24px;
+            margin-bottom: 16px;
+            margin-top: 32px;
+        }
+
+        h2:first-child {
+            margin-top: 0;
+        }
+
+        p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        ul {
+            margin: 16px 0;
+            padding-left: 20px;
+        }
+
+        li {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 8px;
+        }
+
+        .highlight {
+            background: rgba(254, 116, 91, 0.1);
+            border-left: 3px solid #FE745B;
+            padding: 16px;
+            margin: 24px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .contact-info {
+            background: linear-gradient(135deg, rgba(254, 116, 91, 0.1), rgba(255, 154, 133, 0.05));
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 12px;
+            padding: 24px;
+            margin-top: 32px;
+            text-align: center;
+        }
+
+        .contact-email {
+            color: #FE745B;
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .contact-email:hover {
+            color: #FF9A85;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            white-space: nowrap;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        /* Mobile Styles */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .header-right {
+                gap: 20px;
+            }
+
+            .logo {
+                height: 80px;
+            }
+
+            .container {
+                padding: 40px 20px;
+            }
+
+            .page-title {
+                font-size: 36px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .social-icons {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
+        <div class="header-right">
+            <a href="/" class="nav-link">Swap</a>
+            <a href="/roadmap" class="nav-link">Roadmap</a>
+            <a href="/technology" class="nav-link">Technology</a>
+            <a href="/terms" class="nav-link">Terms</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <h1 class="page-title">Privacy Policy</h1>
+        <p class="last-updated">Last updated: September 2025</p>
+
+        <div class="content">
+            <h2>Overview</h2>
+            <p>
+                PEARS is a non-custodial interface that sources quotes from third-party aggregators and lets users submit transactions from their own wallets on the Base network. We are committed to protecting your privacy while providing a transparent and secure trading experience.
+            </p>
+
+            <div class="highlight">
+                <p><strong>Key Point:</strong> PEARS does not custody funds, does not execute trades on behalf of users, and does not require account creation or personal information to use our interface.</p>
+            </div>
+
+            <h2>Data We Process</h2>
+            <ul>
+                <li><strong>Web Server Logs:</strong> IP addresses, user-agent strings, timestamps, and requested URLs for security and performance monitoring</li>
+                <li><strong>On-Chain Data:</strong> Public wallet addresses when you connect your wallet (this data is already public on the blockchain)</li>
+                <li><strong>Error Telemetry:</strong> Technical error information to improve service reliability</li>
+                <li><strong>Usage Analytics:</strong> Anonymized data about page views and user interactions to improve our interface</li>
+            </ul>
+
+            <h2>What We Do NOT Process</h2>
+            <ul>
+                <li>Seed phrases or private keys</li>
+                <li>Personal information (name, email, phone, address)</li>
+                <li>Custodial balances or transaction details beyond public blockchain data</li>
+                <li>Trading history or portfolio information</li>
+                <li>KYC/AML documentation</li>
+            </ul>
+
+            <h2>Cookies and Analytics</h2>
+            <p>
+                We use minimal, privacy-focused analytics to understand how users interact with our interface. We do not use tracking cookies for advertising purposes. Essential cookies may be used for:
+            </p>
+            <ul>
+                <li>Remembering your wallet connection preferences</li>
+                <li>Maintaining session state during your visit</li>
+                <li>Preventing spam and abuse</li>
+            </ul>
+
+            <h2>Data Retention</h2>
+            <ul>
+                <li><strong>Server Logs:</strong> Automatically deleted after 30 days</li>
+                <li><strong>Error Reports:</strong> Retained for 90 days for debugging purposes</li>
+                <li><strong>Analytics Data:</strong> Anonymized and retained for up to 1 year to identify long-term usage patterns</li>
+            </ul>
+
+            <h2>Third-Party Services</h2>
+            <p>
+                PEARS integrates with third-party services to provide functionality:
+            </p>
+            <ul>
+                <li><strong>0x Protocol:</strong> For DEX aggregation and routing (subject to 0x's privacy policy)</li>
+                <li><strong>Wallet Providers:</strong> MetaMask, WalletConnect, etc. (subject to their respective privacy policies)</li>
+                <li><strong>RPC Providers:</strong> For blockchain data access (subject to their privacy policies)</li>
+            </ul>
+
+            <h2>Data Security</h2>
+            <p>
+                We implement industry-standard security measures to protect the limited data we process. However, since we are a non-custodial platform, the security of your funds ultimately depends on your wallet security practices.
+            </p>
+
+            <h2>Your Rights</h2>
+            <p>
+                Given the minimal data we collect and our non-custodial nature, there is limited personal data to manage. However, you can:
+            </p>
+            <ul>
+                <li>Clear your browser data to remove any local preferences</li>
+                <li>Use browser privacy settings to limit data collection</li>
+                <li>Contact us if you have specific privacy concerns</li>
+            </ul>
+
+            <h2>Changes to This Policy</h2>
+            <p>
+                We may update this privacy policy from time to time. We will notify users of material changes by updating the "Last updated" date at the top of this policy.
+            </p>
+
+            <div class="contact-info">
+                <h3>Privacy Questions?</h3>
+                <p>If you have questions about this privacy policy or our data practices, contact us at:</p>
+                <a href="mailto:privacy@pears.finance" class="contact-email">privacy@pears.finance</a>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-socials">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                    <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                    <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                    <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Learn</h3>
+                <div class="footer-links-list">
+                    <a href="/technology" class="footer-link">Technology</a>
+                    <a href="/roadmap" class="footer-link">Roadmap</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
+                    <span class="footer-link" onclick="showComingSoon()">Documentation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showComingSoon() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                border: 1px solid #333;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+                margin: 20px;
+            `;
+
+            modal.innerHTML = `
+                <h2 style="color: #ff6b35; margin-bottom: 20px; font-size: 24px;">Coming Soon!</h2>
+                <p style="color: #ccc; margin-bottom: 30px; line-height: 1.6;">
+                    This feature is currently under development. Stay tuned for updates!
+                </p>
+                <button onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                        style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 30px;
+                               border-radius: 25px;
+                               cursor: pointer;
+                               font-weight: 600;
+                               transition: transform 0.2s;
+                               font-size: 16px;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    Got it!
+                </button>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+    </script>
+</body>
+</html>

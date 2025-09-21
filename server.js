@@ -306,6 +306,11 @@ app.get('/technology', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'technology.html'));
 });
 
+// Serve privacy policy page
+app.get('/privacy', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
+});
+
 // OPTIMIZED endpoint with keep-alive and performance improvements
 app.post('/api/fresh-swap-optimized', async (req, res) => {
   const startTime = Date.now();

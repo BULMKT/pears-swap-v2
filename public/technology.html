@@ -23,10 +23,15 @@
 
         .header {
             display: flex;
-            justify-content: flex-end;
+            justify-content: space-between;
             align-items: center;
             padding: 20px 40px;
             border-bottom: 1px solid rgba(254, 116, 91, 0.1);
+        }
+
+        .logo {
+            height: 120px;
+            width: auto;
         }
 
         .header-right {
@@ -132,8 +137,8 @@
 
         .pillars-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 24px;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 20px;
             margin-bottom: 80px;
         }
 
@@ -258,55 +263,88 @@
 
         /* Vision Section */
         .vision {
-            max-width: 900px;
+            max-width: 1200px;
             margin: 0 auto;
             padding: 80px 20px;
-            text-align: center;
+        }
+
+        .vision-grid {
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr;
+            grid-template-rows: auto auto;
+            gap: 24px;
+            margin-top: 60px;
         }
 
         .vision-card {
-            background: rgba(254, 116, 91, 0.05);
+            background: rgba(255, 255, 255, 0.02);
             border: 1px solid rgba(254, 116, 91, 0.2);
-            border-radius: 24px;
-            padding: 48px;
+            border-radius: 16px;
+            padding: 32px;
+            transition: all 0.3s ease;
             position: relative;
+            overflow: hidden;
         }
 
-        .vision-title {
-            font-size: 36px;
+        .vision-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, transparent, #FE745B, transparent);
+            animation: slide 4s linear infinite;
+        }
+
+        .vision-card:hover {
+            transform: translateY(-5px);
+            border-color: rgba(254, 116, 91, 0.4);
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .vision-card.large {
+            grid-row: span 2;
+        }
+
+        .vision-card.accent {
+            background: linear-gradient(135deg, rgba(254, 116, 91, 0.1), rgba(255, 154, 133, 0.05));
+            border-color: rgba(254, 116, 91, 0.3);
+        }
+
+        .vision-icon {
+            font-size: 48px;
+            margin-bottom: 20px;
+            opacity: 0.9;
+        }
+
+        .vision-card h3 {
+            font-size: 24px;
             font-weight: 700;
-            margin-bottom: 24px;
-            background: linear-gradient(45deg, #FE745B, #FF8A6B);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            background-clip: text;
-        }
-
-        .vision-text {
-            color: rgba(255, 255, 255, 0.8);
-            font-size: 18px;
-            line-height: 1.8;
-            margin-bottom: 32px;
-        }
-
-        .vision-highlight {
-            background: rgba(254, 116, 91, 0.1);
-            border-left: 3px solid #FE745B;
-            padding: 24px;
-            margin: 32px 0;
-            text-align: left;
-            border-radius: 0 12px 12px 0;
-        }
-
-        .vision-highlight h3 {
             color: #FE745B;
-            margin-bottom: 12px;
-            font-size: 20px;
+            margin-bottom: 16px;
         }
 
-        .vision-highlight p {
-            color: rgba(255, 255, 255, 0.7);
+        .vision-card p {
+            color: rgba(255, 255, 255, 0.8);
             line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .vision-cta {
+            margin-top: 24px;
+            padding: 16px;
+            background: rgba(254, 116, 91, 0.1);
+            border-radius: 8px;
+            border: 1px solid rgba(254, 116, 91, 0.2);
+        }
+
+        .cta-text {
+            color: #FE745B;
+            font-weight: 600;
+            font-size: 14px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
         }
 
         /* CTA Section */
@@ -463,8 +501,22 @@
                 font-size: 28px;
             }
 
-            .vision-text {
-                font-size: 16px;
+            .vision-grid {
+                grid-template-columns: 1fr;
+                grid-template-rows: auto;
+                gap: 16px;
+            }
+
+            .vision-card.large {
+                grid-row: span 1;
+            }
+
+            .vision-card {
+                padding: 24px;
+            }
+
+            .vision-icon {
+                font-size: 36px;
             }
 
             .footer-content {
@@ -484,6 +536,7 @@
 <body>
     <!-- Header -->
     <div class="header">
+        <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
         <div class="header-right">
             <a href="/" class="nav-link">Swap</a>
             <a href="/roadmap" class="nav-link">Roadmap</a>
@@ -516,28 +569,28 @@
         <div class="pillars-grid">
             <div class="pillar-card">
                 <div class="pillar-icon">🏗️</div>
-                <h3 class="pillar-title">PEARS-PROTOCOL</h3>
+                <h3 class="pillar-title">0x v2 Routing</h3>
                 <p class="pillar-description">
-                    Custom smart contracts built from scratch for Base optimization. No forks, no shortcuts.
+                    Aggregated execution across Base DEXs via 0x v2, with transparent 0.08% platform fee.
                 </p>
                 <ul class="pillar-features">
-                    <li>Gas-optimized architecture</li>
-                    <li>Direct Uniswap v3 integration</li>
-                    <li>0.08% transparent fee system</li>
-                    <li>ReentrancyGuard protection</li>
+                    <li>Multi-DEX aggregation</li>
+                    <li>Uniswap v3, Aerodrome routing</li>
+                    <li>0.08% transparent fee</li>
+                    <li>Non-custodial interface</li>
                 </ul>
             </div>
 
             <div class="pillar-card">
                 <div class="pillar-icon">⚡</div>
-                <h3 class="pillar-title">Elite Architecture</h3>
+                <h3 class="pillar-title">MEV Protection</h3>
                 <p class="pillar-description">
-                    Backend system engineered for millisecond execution and zero-failure tolerance.
+                    MEV-aware routing on supported routes with private submission when available.
                 </p>
                 <ul class="pillar-features">
-                    <li>Enterprise-grade infrastructure</li>
-                    <li>Quote-and-execute protocol</li>
-                    <li>1.2s ultra-fast timeouts</li>
+                    <li>Protected route detection</li>
+                    <li>Private mempool submission</li>
+                    <li>1.2s ultra-fast quotes</li>
                     <li>Smart quote caching</li>
                 </ul>
             </div>
@@ -584,7 +637,7 @@
                 </div>
                 <div class="metric-item">
                     <div class="metric-value">0.08%</div>
-                    <div class="metric-label">Lowest Fees</div>
+                    <div class="metric-label">Ultra-Low Fee</div>
                 </div>
                 <div class="metric-item">
                     <div class="metric-value">99.9%</div>
@@ -600,40 +653,34 @@
 
     <!-- Vision Section -->
     <div class="vision">
-        <div class="vision-card">
-            <h2 class="vision-title">The PEARS Vision</h2>
+        <h2 class="section-title">The PEARS Vision</h2>
 
-            <p class="vision-text">
-                While others chase features, we chase perfection. PEARS isn't trying to be everything to everyone. We're building the most reliable, fastest, and simplest swap experience in DeFi.
-            </p>
-
-            <div class="vision-highlight">
+        <div class="vision-grid">
+            <div class="vision-card large">
+                <div class="vision-icon">🎯</div>
                 <h3>One Thing, Done Right</h3>
-                <p>
-                    The world doesn't need another DEX with 100 features that work okay. It needs one DEX that works perfectly, every time. That's PEARS.
-                </p>
+                <p>While others chase features, we chase perfection. The world doesn't need another DEX with 100 features that work okay. It needs one that works perfectly, every time.</p>
             </div>
 
-            <p class="vision-text">
-                Our platform is designed for true autonomy - where every swap generates value that flows back to our community. As PEARS grows, so does the reward pool, creating a sustainable cycle where users aren't just trading, they're participating in something bigger.
-            </p>
+            <div class="vision-card">
+                <div class="vision-icon">🌱</div>
+                <h3>Autonomous Growth</h3>
+                <p>Every swap generates value that flows back to our community. As PEARS grows, so does the reward pool.</p>
+            </div>
 
-            <div class="vision-highlight">
+            <div class="vision-card">
+                <div class="vision-icon">🍃</div>
                 <h3>The PEARS Orchard</h3>
-                <p>
-                    Imagine different varieties of pairs, each optimized for specific trading strategies. Premium pairs, high-yield pairs, stable pairs - an entire orchard of opportunities. The PEARS token will be the key that unlocks this ecosystem, where holding isn't just about governance, it's about sharing in the platform's success.
-                </p>
+                <p>Different varieties of pairs for different strategies. Premium pairs, high-yield pairs, stable pairs - an entire ecosystem.</p>
             </div>
 
-            <p class="vision-text">
-                Every transaction fee becomes ecosystem fuel. Every successful swap strengthens the protocol. This isn't just about trading - it's about building the foundation for decentralized finance that actually rewards its participants.
-            </p>
-
-            <div class="vision-highlight">
+            <div class="vision-card accent">
+                <div class="vision-icon">🚀</div>
                 <h3>Built for Tomorrow</h3>
-                <p>
-                    We perfect one thing first: the swap. Then we let organic demand guide what comes next. No forced features, no empty promises - just continuous evolution based on what our community actually needs.
-                </p>
+                <p>We perfect the swap first. Then we let organic demand guide what comes next. No forced features, no empty promises.</p>
+                <div class="vision-cta">
+                    <span class="cta-text">The PEARS token will unlock this entire ecosystem</span>
+                </div>
             </div>
         </div>
     </div>
