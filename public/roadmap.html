@@ -62,6 +62,21 @@
             width: auto;
         }
 
+        /* Mobile Logo */
+        .mobile-logo-container {
+            display: none;
+            text-align: center;
+            padding: 24px 0 0 0;
+            margin-bottom: -60px;
+            position: relative;
+        }
+
+        .mobile-logo {
+            height: 200px;
+            position: relative;
+            left: -30px;
+        }
+
         /* Background Effects */
         .bg-effect {
             position: absolute;
@@ -278,6 +293,17 @@
         @media (max-width: 768px) {
             .header {
                 padding: 16px 20px;
+                justify-content: center;
+            }
+
+            .header-right {
+                margin-top: 0;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .mobile-logo-container {
+                display: block;
             }
 
             .main-content {
@@ -342,12 +368,16 @@
             </div>
         </div>
 
+        <!-- Mobile Logo -->
+        <div class="mobile-logo-container">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="mobile-logo"></a>
+        </div>
+
         <!-- Main Content -->
         <div class="main-content">
             <!-- Hero Section -->
             <div class="hero">
                 <h1 class="hero-title">The Future of PEARS</h1>
-                <p class="hero-subtitle">Ripen & Reward</p>
                 <p class="hero-tagline">
                     We're building the next generation of DeFi experiences. Starting with Base, expanding everywhere.
                     Get rewarded for making the right moves.
