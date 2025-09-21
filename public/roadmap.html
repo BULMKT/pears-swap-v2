@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEARS Roadmap - Ripen and Reward</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #FE745B;
+            background: rgba(254, 116, 91, 0.1);
+        }
+
+        .logo {
+            height: 60px;
+            width: auto;
+        }
+
+        /* Background Effects */
+        .bg-effect {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(254, 116, 91, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 10%;
+            right: 5%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-effect-2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(254, 116, 91, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: 20%;
+            left: 10%;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            max-width: 1200px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        .hero {
+            text-align: center;
+            margin-bottom: 80px;
+        }
+
+        .hero-title {
+            font-size: 64px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 24px;
+            line-height: 1.1;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 16px;
+        }
+
+        .hero-tagline {
+            font-size: 18px;
+            color: rgba(255, 255, 255, 0.6);
+            max-width: 600px;
+            margin: 0 auto;
+            line-height: 1.6;
+        }
+
+        /* Timeline */
+        .timeline {
+            position: relative;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 50%;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: linear-gradient(to bottom, #FE745B, rgba(254, 116, 91, 0.3));
+            transform: translateX(-50%);
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 60px;
+            display: flex;
+            align-items: center;
+        }
+
+        .timeline-item:nth-child(odd) {
+            flex-direction: row;
+        }
+
+        .timeline-item:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .timeline-content {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 16px;
+            padding: 32px;
+            width: 45%;
+            position: relative;
+        }
+
+        .timeline-item:nth-child(odd) .timeline-content {
+            margin-right: 10%;
+        }
+
+        .timeline-item:nth-child(even) .timeline-content {
+            margin-left: 10%;
+        }
+
+        .timeline-dot {
+            position: absolute;
+            left: 50%;
+            width: 20px;
+            height: 20px;
+            background: #FE745B;
+            border-radius: 50%;
+            transform: translateX(-50%);
+            box-shadow: 0 0 20px rgba(254, 116, 91, 0.5);
+            z-index: 2;
+        }
+
+        .timeline-phase {
+            color: #FE745B;
+            font-size: 14px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+
+        .timeline-title {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .timeline-description {
+            color: rgba(255, 255, 255, 0.8);
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .timeline-features {
+            list-style: none;
+        }
+
+        .timeline-features li {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            padding-left: 20px;
+            position: relative;
+        }
+
+        .timeline-features li::before {
+            content: '🍐';
+            position: absolute;
+            left: 0;
+            top: 0;
+        }
+
+        /* Current Status */
+        .current-status {
+            background: rgba(254, 116, 91, 0.1);
+            border: 2px solid #FE745B;
+            border-radius: 16px;
+            padding: 24px;
+            margin-bottom: 80px;
+            text-align: center;
+        }
+
+        .current-status h3 {
+            color: #FE745B;
+            font-size: 20px;
+            margin-bottom: 12px;
+        }
+
+        .current-status p {
+            color: rgba(255, 255, 255, 0.8);
+        }
+
+        /* Call to Action */
+        .cta {
+            text-align: center;
+            margin-top: 80px;
+        }
+
+        .cta-button {
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            text-decoration: none;
+            padding: 16px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 18px;
+            transition: all 0.3s ease;
+            display: inline-block;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(254, 116, 91, 0.4);
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+            }
+
+            .main-content {
+                padding: 20px;
+            }
+
+            .hero-title {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .timeline::before {
+                left: 20px;
+            }
+
+            .timeline-item {
+                flex-direction: column !important;
+                align-items: flex-start;
+                padding-left: 50px;
+            }
+
+            .timeline-content {
+                width: 100% !important;
+                margin: 0 !important;
+            }
+
+            .timeline-dot {
+                left: 20px !important;
+                transform: translateX(-50%);
+            }
+
+            .logo {
+                height: 50px;
+            }
+
+            .header-right {
+                gap: 16px;
+            }
+
+            .nav-link {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Effects -->
+        <div class="bg-effect"></div>
+        <div class="bg-effect-2"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <img src="Logo Pears.png" alt="PEARS" class="logo">
+            <div class="header-right">
+                <a href="/test-design" class="nav-link">Swap</a>
+                <a href="/roadmap" class="nav-link active">Roadmap</a>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <!-- Hero Section -->
+            <div class="hero">
+                <h1 class="hero-title">The Future of PEARS</h1>
+                <p class="hero-subtitle">Ripen & Reward</p>
+                <p class="hero-tagline">
+                    We're building the next generation of DeFi experiences. Starting with Base, expanding everywhere.
+                    Get rewarded for making the right moves.
+                </p>
+            </div>
+
+            <!-- Current Status -->
+            <div class="current-status">
+                <h3>🟢 Currently Live</h3>
+                <p>Multi-token swaps on Base Network with 0.08% fees and lightning-fast execution</p>
+            </div>
+
+            <!-- Timeline -->
+            <div class="timeline">
+                <!-- Phase 1 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 1 - Q4 2024</div>
+                        <h3 class="timeline-title">Live P/L Tracking</h3>
+                        <p class="timeline-description">
+                            Real-time performance tracking for every swap. Watch your positions ripen with live updates every 10 seconds.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Live price movement tracking</li>
+                            <li>24-hour performance windows</li>
+                            <li>Beautiful share cards for wins</li>
+                            <li>Performance analytics dashboard</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phase 2 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 2 - Q1 2025</div>
+                        <h3 class="timeline-title">Rebate System</h3>
+                        <p class="timeline-description">
+                            Automatic rebates when your swaps perform well. Get rewarded for making smart moves with transparent, rules-based payouts.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Daily rebate pools funded by platform fees</li>
+                            <li>Transparent oracle-based scoring</li>
+                            <li>Automatic USDC rebates</li>
+                            <li>Pro-rata reward distribution</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phase 3 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 3 - Q2 2025</div>
+                        <h3 class="timeline-title">Multi-Chain Expansion</h3>
+                        <p class="timeline-description">
+                            Expand beyond Base to Ethereum, Arbitrum, Optimism, and Polygon. Same great experience, everywhere you trade.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Cross-chain swap routing</li>
+                            <li>Unified liquidity aggregation</li>
+                            <li>Chain-specific optimizations</li>
+                            <li>Gasless transactions on L2s</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phase 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 4 - Q3 2025</div>
+                        <h3 class="timeline-title">🍐 Token Launch</h3>
+                        <p class="timeline-description">
+                            Introducing the PEARS token - governance, fee tiers, and enhanced rewards for the community that believed from day one.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Governance and voting rights</li>
+                            <li>Reduced fees for token holders</li>
+                            <li>Enhanced rebate multipliers</li>
+                            <li>Community treasury management</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <!-- Phase 5 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 5 - Q4 2025</div>
+                        <h3 class="timeline-title">Advanced Features</h3>
+                        <p class="timeline-description">
+                            Smart order routing, MEV protection, and advanced trading features for sophisticated users.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Silent peer crossing optimization</li>
+                            <li>MEV-protected transactions</li>
+                            <li>Advanced order types</li>
+                            <li>Professional trading interface</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Call to Action -->
+            <div class="cta">
+                <a href="/test-design" class="cta-button">Start Swapping Today</a>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

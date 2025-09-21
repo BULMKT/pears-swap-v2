@@ -281,6 +281,26 @@ app.get('/v3', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index-v3.html'));
 });
 
+// Serve test design
+app.get('/test-design', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test-design.html'));
+});
+
+// Serve roadmap page
+app.get('/roadmap', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'roadmap.html'));
+});
+
+// Serve v3.5 (new main interface)
+app.get('/v3-5', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'v3-5.html'));
+});
+
+// Serve test-design as the main page (user's preferred UI)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'test-design.html'));
+});
+
 // OPTIMIZED endpoint with keep-alive and performance improvements
 app.post('/api/fresh-swap-optimized', async (req, res) => {
   const startTime = Date.now();
