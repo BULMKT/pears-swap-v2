@@ -327,15 +327,18 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 40px;
+            min-width: 40px;
             height: 40px;
+            padding: 0 12px;
             background: rgba(254, 116, 91, 0.1);
             border: 1px solid rgba(254, 116, 91, 0.2);
             border-radius: 8px;
             color: #FE745B;
             text-decoration: none;
-            font-size: 18px;
+            font-size: 14px;
+            font-weight: 500;
             transition: all 0.3s ease;
+            white-space: nowrap;
         }
 
         .social-icon:hover {
@@ -493,6 +496,19 @@
             .footer {
                 padding: 40px 20px 30px;
             }
+
+            .social-icons {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .social-icon {
+                font-size: 12px;
+                min-width: 35px;
+                height: 35px;
+                padding: 0 8px;
+            }
         }
     </style>
 </head>
@@ -638,17 +654,18 @@
                     <h3>Connect</h3>
                     <div class="social-icons">
                         <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
-                        <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">💬</a>
-                        <a href="https://t.me/pearswap" target="_blank" class="social-icon">📱</a>
-                        <a href="https://github.com/pearswap" target="_blank" class="social-icon">⚡</a>
+                        <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                        <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                        <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
                     </div>
                 </div>
                 <div class="footer-links">
                     <h3>Learn</h3>
                     <div class="footer-links-list">
-                        <span class="footer-link" onclick="showComingSoon()">Terms of Service</span>
+                        <a href="/terms" class="footer-link">Terms of Service</a>
                         <span class="footer-link" onclick="showComingSoon()">Ecosystem</span>
                         <span class="footer-link" onclick="showComingSoon()">Tokenomics</span>
+                        <span class="footer-link" onclick="showComingSoon()">Documentation</span>
                     </div>
                 </div>
             </div>
