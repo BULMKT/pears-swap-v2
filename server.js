@@ -271,7 +271,7 @@ app.post('/api/fresh-swap', async (req, res) => {
   }
 });
 
-// Serve the frontend
+// Serve test-design as the main page (user's preferred UI)
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
@@ -294,11 +294,6 @@ app.get('/roadmap', (req, res) => {
 // Serve v3.5 (new main interface)
 app.get('/v3-5', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'v3-5.html'));
-});
-
-// Serve test-design as the main page (user's preferred UI)
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'test-design.html'));
 });
 
 // OPTIMIZED endpoint with keep-alive and performance improvements

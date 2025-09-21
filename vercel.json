@@ -16,6 +16,30 @@
       "dest": "/server.js"
     },
     {
+      "src": "/health",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/roadmap",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/v3",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/test-design",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/v3-5",
+      "dest": "/server.js"
+    },
+    {
+      "src": "/",
+      "dest": "/server.js"
+    },
+    {
       "src": "/(.*)",
       "dest": "/public/$1"
     }
