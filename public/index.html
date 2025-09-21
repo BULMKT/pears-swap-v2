@@ -948,9 +948,27 @@
             const btn = document.getElementById('swapButton');
 
             try {
+                // Step 0: Ensure wallet is fully ready
+                btn.textContent = 'Checking wallet...';
+                btn.disabled = true;
+                showStatus('🔗 Ensuring wallet connectivity...', 'info');
+
+                // Wait for wallet to be fully initialized
+                if (!provider || !signer || !userAddress) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    if (!provider || !signer || !userAddress) {
+                        throw new Error('Wallet not properly connected. Please reconnect.');
+                    }
+                }
+
+                // Verify network is correct
+                const network = await provider.getNetwork();
+                if (network.chainId !== 8453n) {
+                    throw new Error('Please switch to Base network');
+                }
+
                 // Step 1: Get fresh quote
                 btn.textContent = 'Getting Quote...';
-                btn.disabled = true;
                 showStatus('🔄 Getting fresh quote...', 'info');
 
                 const sellAmount = ethers.parseUnits(fromAmount, fromToken.decimals).toString();
@@ -972,69 +990,108 @@
                 const buyAmount = ethers.formatUnits(swapData.buyAmount, toToken.decimals);
                 console.log(`✅ Quote: ${fromAmount} ${fromToken.symbol} → ${buyAmount} ${toToken.symbol}`);
 
-                // Step 2: Check if we need token approval
-                if (fromToken.address !== '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE' && swapData.issues?.allowance) {
-                    // Need approval
-                    btn.textContent = 'Approve token...';
-                    showStatus('📱 Please approve token spending in MetaMask', 'info');
+                // Step 2: Check if we need token approval for ERC-20 tokens
+                if (fromToken.address !== '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+                    // Get the spender address (0x Exchange Proxy for Base)
+                    const spender = swapData.to; // The contract we're sending the transaction to
 
-                    // Get the allowance target from swap data
-                    const spender = swapData.issues.allowance.spender;
-
-                    // Create approval transaction
+                    // Check current allowance
                     const tokenContract = new ethers.Contract(
                         fromToken.address,
-                        ['function approve(address spender, uint256 amount) returns (bool)'],
-                        signer
+                        [
+                            'function allowance(address owner, address spender) view returns (uint256)',
+                            'function approve(address spender, uint256 amount) returns (bool)'
+                        ],
+                        provider
                     );
 
-                    const approveTx = await tokenContract.approve(
-                        spender,
-                        ethers.MaxUint256 // Approve max amount
-                    );
+                    const currentAllowance = await tokenContract.allowance(userAddress, spender);
+                    const requiredAmount = BigInt(sellAmount);
 
-                    btn.textContent = 'Approving...';
-                    showStatus('⏳ Approving token...', 'info');
-                    await approveTx.wait();
+                    // If allowance is insufficient, approve
+                    if (currentAllowance < requiredAmount) {
+                        btn.textContent = 'Approve token...';
+                        showStatus('📱 Please approve token spending in MetaMask', 'info');
 
-                    // Get fresh quote after approval
-                    btn.textContent = 'Getting new quote...';
-                    const retryResponse = await fetch('/api/v3-quote', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            sellToken: fromToken.address,
-                            buyToken: toToken.address,
-                            sellAmount: sellAmount,
-                            taker: userAddress
-                        })
-                    });
+                        // Create approval transaction with signer
+                        const tokenContractWithSigner = tokenContract.connect(signer);
+                        const approveTx = await tokenContractWithSigner.approve(
+                            spender,
+                            ethers.MaxUint256 // Approve max amount to avoid future approvals
+                        );
 
-                    if (!retryResponse.ok) throw new Error('Failed to get quote after approval');
-                    swapData = await retryResponse.json();
+                        btn.textContent = 'Approving...';
+                        showStatus('⏳ Approving token...', 'info');
+                        await approveTx.wait();
+
+                        // Get fresh quote after approval
+                        btn.textContent = 'Getting new quote...';
+                        const retryResponse = await fetch('/api/v3-quote', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sellToken: fromToken.address,
+                                buyToken: toToken.address,
+                                sellAmount: sellAmount,
+                                taker: userAddress
+                            })
+                        });
+
+                        if (!retryResponse.ok) throw new Error('Failed to get quote after approval');
+                        swapData = await retryResponse.json();
+                        showStatus('✅ Token approved successfully', 'success');
+                    }
                 }
 
-                // Step 3: Execute transaction
+                // Step 3: Get fresh quote just before execution to avoid stale data
+                btn.textContent = 'Getting final quote...';
+                const finalQuoteResponse = await fetch('/api/v3-quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellToken: fromToken.address,
+                        buyToken: toToken.address,
+                        sellAmount: sellAmount,
+                        taker: userAddress
+                    })
+                });
+
+                if (!finalQuoteResponse.ok) throw new Error('Failed to get final quote');
+                const finalSwapData = await finalQuoteResponse.json();
+
+                // Step 4: Execute transaction with fresh data
                 btn.textContent = 'Confirming swap...';
                 showStatus('📱 Please confirm the swap in MetaMask', 'info');
 
                 const txParams = {
-                    to: swapData.to,
-                    data: swapData.data,
-                    value: BigInt(swapData.value || '0')
+                    to: finalSwapData.to,
+                    data: finalSwapData.data,
+                    value: BigInt(finalSwapData.value || '0')
                 };
 
-                // Estimate gas
+                // Simulate transaction first to catch reverts early
+                try {
+                    await provider.call({
+                        ...txParams,
+                        from: userAddress
+                    });
+                } catch (simulationError) {
+                    console.error('Transaction simulation failed:', simulationError);
+                    throw new Error(`Transaction would fail: ${simulationError.message}`);
+                }
+
+                // Estimate gas with buffer
                 const gasEstimate = await provider.estimateGas({
                     ...txParams,
                     from: userAddress
                 });
+                const gasLimit = gasEstimate + (gasEstimate / 5n); // Add 20% buffer
 
                 // Send transaction
                 btn.textContent = 'Processing...';
                 const tx = await signer.sendTransaction({
                     ...txParams,
-                    gasLimit: gasEstimate
+                    gasLimit: gasLimit
                 });
 
                 showStatus('⏳ Swap processing...', 'info');
@@ -1064,14 +1121,26 @@
                 console.error('Swap error:', error);
                 let errorMsg = 'Swap failed. ';
 
+                // Enhanced error handling with more specific messages
                 if (error.message?.includes('insufficient funds')) {
                     errorMsg = 'Insufficient balance for this swap';
                 } else if (error.message?.includes('user rejected') || error.message?.includes('User denied')) {
                     errorMsg = 'Transaction cancelled';
                 } else if (error.message?.includes('allowance')) {
-                    errorMsg = 'Please try again - approval may be needed';
+                    errorMsg = 'Token approval needed - please try again';
+                } else if (error.message?.includes('Transaction would fail')) {
+                    errorMsg = 'Swap conditions changed - please try again';
+                } else if (error.message?.includes('execution reverted')) {
+                    // Try to extract revert reason
+                    if (error.receipt && error.receipt.status === 0) {
+                        errorMsg = 'Transaction reverted - likely due to price impact or slippage';
+                    } else {
+                        errorMsg = 'Transaction failed - please try again';
+                    }
+                } else if (error.message?.includes('network')) {
+                    errorMsg = 'Network error - please check connection';
                 } else {
-                    errorMsg += error.message?.substring(0, 50) || 'Please try again';
+                    errorMsg += error.message?.substring(0, 100) || 'Please try again';
                 }
 
                 showStatus(errorMsg, 'error');
