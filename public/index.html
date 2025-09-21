@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PEARS - Swap on Base</title>
+    <link rel="preconnect" href="https://api.0x.org">
+    <link rel="dns-prefetch" href="//api.0x.org">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
 
@@ -1051,13 +1055,18 @@
             document.getElementById('statusMessage').style.display = 'none';
         }
 
-        // Get quote for swap
+        // Get quote for swap with TTL guard
         let quoteTimeout = null;
+        let lastQuote = null;
+        let lastQuoteTime = 0;
+
         async function getQuote() {
             const fromAmount = document.getElementById('fromAmount').value;
 
             if (!fromAmount || parseFloat(fromAmount) <= 0) {
                 document.getElementById('toAmount').value = '';
+                lastQuote = null;
+                lastQuoteTime = 0;
                 return;
             }
 
@@ -1084,10 +1093,20 @@
                 if (quote.buyAmount) {
                     const buyAmount = ethers.formatUnits(quote.buyAmount, toToken.decimals);
                     document.getElementById('toAmount').value = parseFloat(buyAmount).toFixed(6);
+
+                    // Store quote with timestamp for TTL guard
+                    lastQuote = quote;
+                    lastQuoteTime = Date.now();
                 }
             } catch (error) {
                 console.error('Error getting quote:', error);
             }
+        }
+
+        // TTL guard function - check if quote is too old (>10s)
+        function isQuoteFresh() {
+            if (!lastQuote || !lastQuoteTime) return false;
+            return (Date.now() - lastQuoteTime) < 10000; // 10 seconds
         }
 
         // Execute real swap using V3 API
@@ -1126,9 +1145,22 @@
                     throw new Error('Please switch to Base network');
                 }
 
-                // Step 1: Get fresh quote
-                btn.textContent = 'Getting Quote...';
-                showStatus('🔄 Getting fresh quote...', 'info');
+                // Step 1: Check if we need a fresh quote (TTL guard)
+                if (!isQuoteFresh()) {
+                    btn.textContent = 'Getting Fresh Quote...';
+                    showStatus('🔄 Getting fresh quote (previous quote expired)...', 'info');
+                    await getQuote(); // Get fresh quote
+                }
+
+                if (!lastQuote) {
+                    btn.textContent = 'Getting Quote...';
+                    showStatus('🔄 Getting quote...', 'info');
+                    await getQuote();
+                }
+
+                if (!lastQuote) {
+                    throw new Error('Failed to get quote');
+                }
 
                 const sellAmount = ethers.parseUnits(fromAmount, fromToken.decimals).toString();
 

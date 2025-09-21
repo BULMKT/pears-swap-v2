@@ -29,11 +29,12 @@
         /* Header */
         .header {
             display: flex;
-            justify-content: center;
+            justify-content: space-between;
             align-items: center;
             padding: 20px 40px;
             position: relative;
             z-index: 10;
+            border-bottom: 1px solid rgba(254, 116, 91, 0.1);
         }
 
         .header-right {
@@ -58,7 +59,7 @@
         }
 
         .logo {
-            height: 60px;
+            height: 120px;
             width: auto;
         }
 
@@ -439,7 +440,16 @@
             }
 
             .mobile-logo-container {
-                display: block;
+                display: none;
+            }
+
+            .header {
+                flex-direction: column;
+                gap: 20px;
+            }
+
+            .logo {
+                height: 80px;
             }
 
             .main-content {
@@ -520,9 +530,12 @@
 
         <!-- Header -->
         <div class="header">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
             <div class="header-right">
                 <a href="/" class="nav-link">Swap</a>
                 <a href="/roadmap" class="nav-link active">Roadmap</a>
+                <a href="/technology" class="nav-link">Technology</a>
+                <a href="/terms" class="nav-link">Terms</a>
             </div>
         </div>
 
@@ -545,7 +558,7 @@
             <!-- Current Status -->
             <div class="current-status">
                 <h3>🟢 Currently Live</h3>
-                <p>Multi-token swaps on Base Network with 0.08% fees and lightning-fast execution</p>
+                <p>Multi-token swaps on Base Network with 0.08% fees, MEV protection, and lightning-fast execution</p>
             </div>
 
             <!-- Timeline -->
@@ -554,16 +567,16 @@
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="timeline-phase">Phase 1 - Q4 2024</div>
-                        <h3 class="timeline-title">Live P/L Tracking</h3>
+                        <div class="timeline-phase">Phase 1 - Q4 2025</div>
+                        <h3 class="timeline-title">Live P/L & Rewards</h3>
                         <p class="timeline-description">
-                            Real-time performance tracking for every swap. Watch your positions ripen with live updates every 10 seconds.
+                            Real-time performance tracking and automatic rebates. Watch your positions ripen and get rewarded for smart moves.
                         </p>
                         <ul class="timeline-features">
                             <li>Live price movement tracking</li>
                             <li>24-hour performance windows</li>
+                            <li>Automatic USDC rebates for profitable swaps</li>
                             <li>Beautiful share cards for wins</li>
-                            <li>Performance analytics dashboard</li>
                         </ul>
                     </div>
                 </div>
@@ -572,16 +585,16 @@
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="timeline-phase">Phase 2 - Q1 2025</div>
-                        <h3 class="timeline-title">Rebate System</h3>
+                        <div class="timeline-phase">Phase 2 - Q1 2026</div>
+                        <h3 class="timeline-title">Multi-Chain & Orchard Points</h3>
                         <p class="timeline-description">
-                            Automatic rebates when your swaps perform well. Get rewarded for making smart moves with transparent, rules-based payouts.
+                            Expand beyond Base and introduce trade history points system. Collect points from your trading activity across chains.
                         </p>
                         <ul class="timeline-features">
-                            <li>Daily rebate pools funded by platform fees</li>
-                            <li>Transparent oracle-based scoring</li>
-                            <li>Automatic USDC rebates</li>
-                            <li>Pro-rata reward distribution</li>
+                            <li>Cross-chain swap routing</li>
+                            <li>Trade history points accumulation</li>
+                            <li>Orchard treasure hunt events</li>
+                            <li>Chain-specific optimizations</li>
                         </ul>
                     </div>
                 </div>
@@ -590,25 +603,7 @@
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="timeline-phase">Phase 3 - Q2 2025</div>
-                        <h3 class="timeline-title">Multi-Chain Expansion</h3>
-                        <p class="timeline-description">
-                            Expand beyond Base to Ethereum, Arbitrum, Optimism, and Polygon. Same great experience, everywhere you trade.
-                        </p>
-                        <ul class="timeline-features">
-                            <li>Cross-chain swap routing</li>
-                            <li>Unified liquidity aggregation</li>
-                            <li>Chain-specific optimizations</li>
-                            <li>Gasless transactions on L2s</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <!-- Phase 4 -->
-                <div class="timeline-item">
-                    <div class="timeline-dot"></div>
-                    <div class="timeline-content">
-                        <div class="timeline-phase">Phase 4 - Q3 2025</div>
+                        <div class="timeline-phase">Phase 3 - To Be Confirmed</div>
                         <h3 class="timeline-title">🍐 Token Launch</h3>
                         <p class="timeline-description">
                             Introducing the PEARS token - governance, fee tiers, and enhanced rewards for the community that believed from day one.
@@ -622,20 +617,38 @@
                     </div>
                 </div>
 
+                <!-- Phase 4 -->
+                <div class="timeline-item">
+                    <div class="timeline-dot"></div>
+                    <div class="timeline-content">
+                        <div class="timeline-phase">Phase 4 - Q2 2026</div>
+                        <h3 class="timeline-title">Unified Liquidity</h3>
+                        <p class="timeline-description">
+                            Advanced liquidity aggregation across all supported chains with gasless transactions and unified balances.
+                        </p>
+                        <ul class="timeline-features">
+                            <li>Unified liquidity aggregation</li>
+                            <li>Gasless transactions on L2s</li>
+                            <li>Cross-chain balance management</li>
+                            <li>Advanced routing algorithms</li>
+                        </ul>
+                    </div>
+                </div>
+
                 <!-- Phase 5 -->
                 <div class="timeline-item">
                     <div class="timeline-dot"></div>
                     <div class="timeline-content">
-                        <div class="timeline-phase">Phase 5 - Q4 2025</div>
-                        <h3 class="timeline-title">Advanced Features</h3>
+                        <div class="timeline-phase">Phase 5 - Q4 2026</div>
+                        <h3 class="timeline-title">Professional Trading</h3>
                         <p class="timeline-description">
-                            Smart order routing, MEV protection, and advanced trading features for sophisticated users.
+                            Advanced trading features and tools for sophisticated users who want institutional-grade capabilities.
                         </p>
                         <ul class="timeline-features">
                             <li>Silent peer crossing optimization</li>
-                            <li>MEV-protected transactions</li>
                             <li>Advanced order types</li>
                             <li>Professional trading interface</li>
+                            <li>Institutional API access</li>
                         </ul>
                     </div>
                 </div>
@@ -665,6 +678,7 @@
                         <a href="/technology" class="footer-link">Technology</a>
                         <a href="/roadmap" class="footer-link">Roadmap</a>
                         <a href="/terms" class="footer-link">Terms of Service</a>
+                        <a href="/privacy" class="footer-link">Privacy Policy</a>
                         <span class="footer-link" onclick="showComingSoon()">Documentation</span>
                     </div>
                 </div>

@@ -29,9 +29,8 @@
         }
 
         .logo {
-            font-size: 24px;
-            font-weight: bold;
-            color: #FE745B;
+            height: 120px;
+            width: auto;
         }
 
         .header-right {
@@ -251,10 +250,11 @@
 </head>
 <body>
     <div class="header">
-        <div class="logo">PEARS</div>
+        <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
         <div class="header-right">
             <a href="/" class="nav-link">Swap</a>
             <a href="/roadmap" class="nav-link">Roadmap</a>
+            <a href="/technology" class="nav-link">Technology</a>
             <a href="/terms" class="nav-link active">Terms</a>
         </div>
     </div>
@@ -262,7 +262,7 @@
     <div class="container">
         <div class="title">
             <h1>Terms of Service</h1>
-            <p>Last updated: December 2024</p>
+            <p>Last updated: September 2025</p>
         </div>
 
         <div class="content">
@@ -277,14 +277,18 @@
 
             <div class="section">
                 <h2>2. Description of Service</h2>
-                <p>PEARS is a decentralized exchange (DEX) protocol that allows users to swap cryptocurrency tokens directly from their wallets. The Platform facilitates peer-to-peer transactions on the Base blockchain network.</p>
+                <p>PEARS is a non-custodial interface that sources quotes from third-party aggregators and lets users submit transactions from their own wallets on the Base network. The Platform provides a user interface for token swapping via 0x Protocol aggregation.</p>
+
+                <div class="highlight">
+                    <p><strong>Important:</strong> PEARS does not custody funds, does not execute trades on behalf of users, and operates as an interface to existing DeFi protocols.</p>
+                </div>
 
                 <h3>Key Features:</h3>
                 <ul>
-                    <li>Token swapping functionality</li>
+                    <li>Non-custodial token swapping interface</li>
                     <li>Integration with Web3 wallets</li>
-                    <li>Access to liquidity pools</li>
-                    <li>Real-time pricing and quotes</li>
+                    <li>0x Protocol aggregation for best prices</li>
+                    <li>Real-time pricing and quotes on Base network</li>
                 </ul>
             </div>
 
@@ -333,7 +337,7 @@
 
             <div class="section">
                 <h2>6. Limitation of Liability</h2>
-                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, PEARS SWAP SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, PEARS SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
                 <ul>
                     <li>Loss of profits, data, or other intangible losses</li>
                     <li>Damages resulting from unauthorized access to your account</li>
@@ -357,13 +361,7 @@
                 <h2>8. Privacy and Data</h2>
                 <p>Your privacy is important to us. Our data collection and use practices are governed by our Privacy Policy, which is incorporated into these Terms by reference.</p>
 
-                <h3>Data We Collect:</h3>
-                <ul>
-                    <li>Wallet addresses (public blockchain data)</li>
-                    <li>Transaction data and swap history</li>
-                    <li>Usage analytics and performance metrics</li>
-                    <li>Technical information about your device and browser</li>
-                </ul>
+                <p>For detailed information about our data practices, please see our <a href="/privacy" style="color: #FE745B;">Privacy Policy</a>.</p>
             </div>
 
             <div class="section">
@@ -402,8 +400,8 @@
                 <h2>14. Contact Information</h2>
                 <p>If you have questions about these Terms, please contact us:</p>
                 <ul>
-                    <li><strong>Email:</strong> legal@pearswap.com</li>
-                    <li><strong>Website:</strong> https://pearswap.com</li>
+                    <li><strong>Email:</strong> legal@pears.finance</li>
+                    <li><strong>Website:</strong> https://pears.finance</li>
                     <li><strong>Address:</strong> Dubai International Financial Centre, Dubai, UAE</li>
                 </ul>
             </div>
@@ -432,6 +430,7 @@
                     <a href="/technology" class="footer-link">Technology</a>
                     <a href="/roadmap" class="footer-link">Roadmap</a>
                     <a href="/terms" class="footer-link">Terms of Service</a>
+                    <a href="/privacy" class="footer-link">Privacy Policy</a>
                     <span class="footer-link" onclick="showComingSoon()">Documentation</span>
                 </div>
             </div>

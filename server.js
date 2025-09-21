@@ -87,14 +87,13 @@ app.post('/api/quote', async (req, res) => {
       slippageBps: '200'
     });
 
-    const response = await axios.get(
+    const response = await axiosOptimized.get(
       `https://api.0x.org/swap/allowance-holder/quote?${params}`,
       {
         headers: {
           '0x-api-key': ZEROX_API_KEY,
           '0x-version': 'v2'
-        },
-        timeout: 3000 // 3 second timeout for speed
+        }
       }
     );
 
@@ -174,14 +173,13 @@ app.post('/api/quote-and-execute', async (req, res) => {
     });
 
     // Use allowance-holder for all swaps - it handles ETH correctly too
-    const response = await axios.get(
+    const response = await axiosOptimized.get(
       `https://api.0x.org/swap/allowance-holder/quote?${params}`,
       {
         headers: {
           '0x-api-key': ZEROX_API_KEY,
           '0x-version': 'v2'
-        },
-        timeout: 2000 // Fast timeout for elite speed
+        }
       }
     );
 
@@ -237,14 +235,13 @@ app.post('/api/fresh-swap', async (req, res) => {
       slippageBps: '200'
     });
 
-    const response = await axios.get(
+    const response = await axiosOptimized.get(
       `https://api.0x.org/swap/allowance-holder/quote?${params}`,
       {
         headers: {
           '0x-api-key': ZEROX_API_KEY,
           '0x-version': 'v2'
-        },
-        timeout: 3000
+        }
       }
     );
 
