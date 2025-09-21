@@ -296,6 +296,11 @@ app.get('/v3-5', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'v3-5.html'));
 });
 
+// Serve terms page
+app.get('/terms', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'terms.html'));
+});
+
 // OPTIMIZED endpoint with keep-alive and performance improvements
 app.post('/api/fresh-swap-optimized', async (req, res) => {
   const startTime = Date.now();

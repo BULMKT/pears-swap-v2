@@ -36,6 +36,10 @@
       "dest": "/server.js"
     },
     {
+      "src": "/terms",
+      "dest": "/server.js"
+    },
+    {
       "src": "/",
       "dest": "/server.js"
     },

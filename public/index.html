@@ -358,6 +358,142 @@
             opacity: 1;
         }
 
+        /* Main Content Spacing */
+        .main-content {
+            margin-bottom: 80px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        /* Coming Soon Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal h3 {
+            color: #FE745B;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: translateY(-2px);
+        }
+
         /* Token Modal */
         .token-modal {
             display: none;
@@ -548,6 +684,29 @@
             .token-modal-content {
                 width: 95%;
                 padding: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .footer {
+                padding: 40px 20px 30px;
+            }
+
+            .social-icons {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .social-icon {
+                font-size: 12px;
+                min-width: 35px;
+                height: 35px;
+                padding: 0 8px;
             }
         }
     </style>
@@ -1184,6 +1343,92 @@
                 document.getElementById('toAmount').value = '';
             }
         });
+        // Function to show "Coming Soon" modal for footer links
+        function showComingSoon() {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            // Create modal content
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                border: 1px solid #333;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+                margin: 20px;
+            `;
+
+            modal.innerHTML = `
+                <h2 style="color: #ff6b35; margin-bottom: 20px; font-size: 24px;">Coming Soon!</h2>
+                <p style="color: #ccc; margin-bottom: 30px; line-height: 1.6;">
+                    This feature is currently under development. Stay tuned for updates!
+                </p>
+                <button onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                        style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 30px;
+                               border-radius: 25px;
+                               cursor: pointer;
+                               font-weight: 600;
+                               transition: transform 0.2s;
+                               font-size: 16px;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    Got it!
+                </button>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Close modal when clicking overlay
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
     </script>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-socials">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                    <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                    <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                    <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Learn</h3>
+                <div class="footer-links-list">
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <span class="footer-link" onclick="showComingSoon()">Ecosystem</span>
+                    <span class="footer-link" onclick="showComingSoon()">Tokenomics</span>
+                    <span class="footer-link" onclick="showComingSoon()">Documentation</span>
+                </div>
+            </div>
+        </div>
+    </div>
 </body>
 </html>

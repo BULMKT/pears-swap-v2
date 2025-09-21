@@ -29,7 +29,7 @@
         /* Header */
         .header {
             display: flex;
-            justify-content: space-between;
+            justify-content: center;
             align-items: center;
             padding: 20px 40px;
             position: relative;
@@ -64,7 +64,7 @@
 
         /* Mobile Logo */
         .mobile-logo-container {
-            display: none;
+            display: block;
             text-align: center;
             padding: 24px 0 0 0;
             margin-bottom: -60px;
@@ -282,11 +282,144 @@
             font-size: 18px;
             transition: all 0.3s ease;
             display: inline-block;
+            box-shadow: 0 0 20px rgba(254, 116, 91, 0.3);
         }
 
         .cta-button:hover {
             transform: translateY(-2px);
-            box-shadow: 0 10px 25px rgba(254, 116, 91, 0.4);
+            box-shadow: 0 10px 25px rgba(254, 116, 91, 0.4), 0 0 30px rgba(254, 116, 91, 0.5);
+        }
+
+        .cta {
+            margin-bottom: 120px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        /* Coming Soon Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal h3 {
+            color: #FE745B;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: translateY(-2px);
         }
 
         /* Responsive */
@@ -350,6 +483,16 @@
                 font-size: 14px;
                 padding: 6px 12px;
             }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .footer {
+                padding: 40px 20px 30px;
+            }
         }
     </style>
 </head>
@@ -361,7 +504,6 @@
 
         <!-- Header -->
         <div class="header">
-            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
             <div class="header-right">
                 <a href="/" class="nav-link">Swap</a>
                 <a href="/roadmap" class="nav-link active">Roadmap</a>
@@ -488,6 +630,55 @@
                 <a href="/" class="cta-button">Start Swapping Today</a>
             </div>
         </div>
+
+        <!-- Footer -->
+        <div class="footer">
+            <div class="footer-content">
+                <div class="footer-socials">
+                    <h3>Connect</h3>
+                    <div class="social-icons">
+                        <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                        <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">💬</a>
+                        <a href="https://t.me/pearswap" target="_blank" class="social-icon">📱</a>
+                        <a href="https://github.com/pearswap" target="_blank" class="social-icon">⚡</a>
+                    </div>
+                </div>
+                <div class="footer-links">
+                    <h3>Learn</h3>
+                    <div class="footer-links-list">
+                        <span class="footer-link" onclick="showComingSoon()">Terms of Service</span>
+                        <span class="footer-link" onclick="showComingSoon()">Ecosystem</span>
+                        <span class="footer-link" onclick="showComingSoon()">Tokenomics</span>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
+
+    <!-- Coming Soon Modal -->
+    <div id="comingSoonModal" class="modal">
+        <div class="modal-content">
+            <h3>Coming Soon</h3>
+            <p>This feature is currently under development. Stay tuned for updates!</p>
+            <button class="modal-close" onclick="hideComingSoon()">Got it</button>
+        </div>
+    </div>
+
+    <script>
+        function showComingSoon() {
+            document.getElementById('comingSoonModal').style.display = 'flex';
+        }
+
+        function hideComingSoon() {
+            document.getElementById('comingSoonModal').style.display = 'none';
+        }
+
+        // Close modal when clicking outside
+        document.getElementById('comingSoonModal').addEventListener('click', function(e) {
+            if (e.target === this) {
+                hideComingSoon();
+            }
+        });
+    </script>
 </body>
 </html>

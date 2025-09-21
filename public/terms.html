@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Terms of Service - Pears Swap</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(ellipse at top, #0f0f0f 0%, #000000 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 40px;
+            border-bottom: 1px solid rgba(254, 116, 91, 0.1);
+        }
+
+        .logo {
+            font-size: 24px;
+            font-weight: bold;
+            color: #FE745B;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 32px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #FE745B;
+        }
+
+        .nav-link.active {
+            color: #FE745B;
+        }
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 40px 20px 120px;
+        }
+
+        .title {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .title h1 {
+            font-size: 48px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 16px;
+        }
+
+        .title p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 18px;
+        }
+
+        .content {
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid rgba(254, 116, 91, 0.1);
+            border-radius: 16px;
+            padding: 40px;
+            margin-bottom: 40px;
+        }
+
+        .section {
+            margin-bottom: 32px;
+        }
+
+        .section h2 {
+            color: #FE745B;
+            font-size: 24px;
+            margin-bottom: 16px;
+            font-weight: 600;
+        }
+
+        .section h3 {
+            color: #FF8A6B;
+            font-size: 20px;
+            margin-bottom: 12px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        .section p {
+            color: rgba(255, 255, 255, 0.9);
+            margin-bottom: 16px;
+            line-height: 1.7;
+        }
+
+        .section ul {
+            color: rgba(255, 255, 255, 0.9);
+            margin-left: 20px;
+            margin-bottom: 16px;
+        }
+
+        .section li {
+            margin-bottom: 8px;
+            line-height: 1.6;
+        }
+
+        .highlight {
+            background: rgba(254, 116, 91, 0.1);
+            border-left: 3px solid #FE745B;
+            padding: 16px 20px;
+            margin: 20px 0;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 18px;
+            transition: all 0.3s ease;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                flex-direction: column;
+                gap: 16px;
+            }
+
+            .header-right {
+                gap: 20px;
+            }
+
+            .container {
+                padding: 20px 16px 80px;
+            }
+
+            .title h1 {
+                font-size: 36px;
+            }
+
+            .content {
+                padding: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+            }
+
+            .footer {
+                padding: 40px 20px 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <div class="logo">Pears</div>
+        <div class="header-right">
+            <a href="/" class="nav-link">Swap</a>
+            <a href="/roadmap" class="nav-link">Roadmap</a>
+            <a href="/terms" class="nav-link active">Terms</a>
+        </div>
+    </div>
+
+    <div class="container">
+        <div class="title">
+            <h1>Terms of Service</h1>
+            <p>Last updated: December 2024</p>
+        </div>
+
+        <div class="content">
+            <div class="section">
+                <h2>1. Acceptance of Terms</h2>
+                <p>By accessing or using Pears Swap ("the Platform", "we", "us", or "our"), you agree to be bound by these Terms of Service ("Terms"). If you do not agree to these Terms, you may not access or use the Platform.</p>
+
+                <div class="highlight">
+                    <p><strong>Important:</strong> These Terms constitute a legally binding agreement between you and Pears Swap. Please read them carefully.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>2. Description of Service</h2>
+                <p>Pears Swap is a decentralized exchange (DEX) protocol that allows users to swap cryptocurrency tokens directly from their wallets. The Platform facilitates peer-to-peer transactions on the Base blockchain network.</p>
+
+                <h3>Key Features:</h3>
+                <ul>
+                    <li>Token swapping functionality</li>
+                    <li>Integration with Web3 wallets</li>
+                    <li>Access to liquidity pools</li>
+                    <li>Real-time pricing and quotes</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>3. Eligibility and Restrictions</h2>
+                <p>You must be at least 18 years old and have the legal capacity to enter into agreements in your jurisdiction to use the Platform.</p>
+
+                <h3>Prohibited Jurisdictions:</h3>
+                <p>The Platform is not available to users in jurisdictions where cryptocurrency trading is prohibited by law. Users are responsible for ensuring compliance with their local laws and regulations.</p>
+
+                <h3>Prohibited Activities:</h3>
+                <ul>
+                    <li>Money laundering or terrorist financing</li>
+                    <li>Market manipulation or fraud</li>
+                    <li>Violation of any applicable laws or regulations</li>
+                    <li>Attempting to exploit or hack the Platform</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>4. Risks and Disclaimers</h2>
+                <div class="highlight">
+                    <p><strong>WARNING:</strong> Cryptocurrency trading involves substantial risk of loss. You should carefully consider whether trading is suitable for you given your financial situation.</p>
+                </div>
+
+                <h3>Key Risks Include:</h3>
+                <ul>
+                    <li><strong>Price Volatility:</strong> Cryptocurrency prices can fluctuate dramatically</li>
+                    <li><strong>Smart Contract Risk:</strong> Technical vulnerabilities in smart contracts</li>
+                    <li><strong>Impermanent Loss:</strong> Potential losses when providing liquidity</li>
+                    <li><strong>Regulatory Risk:</strong> Changes in laws and regulations</li>
+                    <li><strong>Technical Risk:</strong> Network congestion, failed transactions</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>5. No Warranties</h2>
+                <p>THE PLATFORM IS PROVIDED "AS IS" AND "AS AVAILABLE" WITHOUT WARRANTIES OF ANY KIND, EITHER EXPRESS OR IMPLIED. WE DISCLAIM ALL WARRANTIES, INCLUDING BUT NOT LIMITED TO:</p>
+                <ul>
+                    <li>Merchantability and fitness for a particular purpose</li>
+                    <li>Accuracy, completeness, or reliability of content</li>
+                    <li>Uninterrupted or error-free operation</li>
+                    <li>Security of transactions or data</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>6. Limitation of Liability</h2>
+                <p>TO THE MAXIMUM EXTENT PERMITTED BY LAW, PEARS SWAP SHALL NOT BE LIABLE FOR ANY INDIRECT, INCIDENTAL, SPECIAL, CONSEQUENTIAL, OR PUNITIVE DAMAGES, INCLUDING BUT NOT LIMITED TO:</p>
+                <ul>
+                    <li>Loss of profits, data, or other intangible losses</li>
+                    <li>Damages resulting from unauthorized access to your account</li>
+                    <li>Damages resulting from network failures or smart contract bugs</li>
+                    <li>Any damages exceeding the amount of fees paid to us in the 12 months preceding the claim</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>7. Indemnification</h2>
+                <p>You agree to indemnify, defend, and hold harmless Pears Swap and its officers, directors, employees, and agents from any claims, damages, losses, or expenses arising out of:</p>
+                <ul>
+                    <li>Your use of the Platform</li>
+                    <li>Your violation of these Terms</li>
+                    <li>Your violation of any applicable laws or regulations</li>
+                    <li>Your infringement of any third-party rights</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>8. Privacy and Data</h2>
+                <p>Your privacy is important to us. Our data collection and use practices are governed by our Privacy Policy, which is incorporated into these Terms by reference.</p>
+
+                <h3>Data We Collect:</h3>
+                <ul>
+                    <li>Wallet addresses (public blockchain data)</li>
+                    <li>Transaction data and swap history</li>
+                    <li>Usage analytics and performance metrics</li>
+                    <li>Technical information about your device and browser</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <h2>9. Intellectual Property</h2>
+                <p>The Platform and its content are protected by copyright, trademark, and other intellectual property laws. You may not reproduce, distribute, or create derivative works without our express written permission.</p>
+            </div>
+
+            <div class="section">
+                <h2>10. Modifications to Terms</h2>
+                <p>We reserve the right to modify these Terms at any time. We will notify users of material changes by posting the updated Terms on the Platform. Your continued use constitutes acceptance of the modified Terms.</p>
+            </div>
+
+            <div class="section">
+                <h2>11. Termination</h2>
+                <p>We may terminate or suspend your access to the Platform at any time, with or without cause, and with or without notice. Upon termination, your right to use the Platform will cease immediately.</p>
+            </div>
+
+            <div class="section">
+                <h2>12. Governing Law and Dispute Resolution</h2>
+                <p>These Terms shall be governed by and construed in accordance with the laws of the United Arab Emirates, without regard to its conflict of law provisions.</p>
+
+                <h3>Dispute Resolution:</h3>
+                <p>Any disputes arising out of or relating to these Terms or the Platform shall be resolved through binding arbitration in Dubai, UAE, in accordance with the DIFC-LCIA Arbitration Rules.</p>
+
+                <div class="highlight">
+                    <p><strong>Jurisdiction:</strong> The courts of Dubai, UAE shall have exclusive jurisdiction over any matters not subject to arbitration.</p>
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>13. Severability</h2>
+                <p>If any provision of these Terms is found to be unenforceable or invalid, the remaining provisions will remain in full force and effect.</p>
+            </div>
+
+            <div class="section">
+                <h2>14. Contact Information</h2>
+                <p>If you have questions about these Terms, please contact us:</p>
+                <ul>
+                    <li><strong>Email:</strong> legal@pearswap.com</li>
+                    <li><strong>Website:</strong> https://pearswap.com</li>
+                    <li><strong>Address:</strong> Dubai International Financial Centre, Dubai, UAE</li>
+                </ul>
+            </div>
+
+            <div class="section">
+                <p><em>By using Pears Swap, you acknowledge that you have read, understood, and agree to be bound by these Terms of Service.</em></p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-socials">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                    <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                    <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                    <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Learn</h3>
+                <div class="footer-links-list">
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <span class="footer-link" onclick="showComingSoon()">Ecosystem</span>
+                    <span class="footer-link" onclick="showComingSoon()">Tokenomics</span>
+                    <span class="footer-link" onclick="showComingSoon()">Documentation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function showComingSoon() {
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                border: 1px solid #333;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+                margin: 20px;
+            `;
+
+            modal.innerHTML = `
+                <h2 style="color: #ff6b35; margin-bottom: 20px; font-size: 24px;">Coming Soon!</h2>
+                <p style="color: #ccc; margin-bottom: 30px; line-height: 1.6;">
+                    This feature is currently under development. Stay tuned for updates!
+                </p>
+                <button onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                        style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 30px;
+                               border-radius: 25px;
+                               cursor: pointer;
+                               font-weight: 600;
+                               transition: transform 0.2s;
+                               font-size: 16px;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    Got it!
+                </button>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+    </script>
+</body>
+</html>
