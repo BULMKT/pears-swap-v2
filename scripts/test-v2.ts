@@ -7,7 +7,7 @@ const RPC = process.env.BASE_RPC!;
 const PK = `0x${process.env.PRIVATE_KEY}` as `0x${string}`;
 const WETH = getAddress('0x4200000000000000000000000000000000000006');
 const USDC = getAddress('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913');
-const PEARS_V2 = getAddress('0x9453187AFc706EE0cB901DcFF17047be4ce2925F'); // New simplified contract
+const PEARS_V2 = getAddress('0x61f44a75e3c20b7413fa3AE31C928aAbb7773C2B'); // Official PEARS DEX Router V2
 
 const account = privateKeyToAccount(PK);
 const walletClient = createWalletClient({ chain: base, account, transport: http(RPC) });
