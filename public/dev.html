@@ -1127,8 +1127,62 @@
 
         // Get wallet tokens instantly (no API calls)
         function getWalletTokensInstant() {
-            // Removed frequent logging for performance
-            return [...walletTokensInstant]; // Return copy for safety
+            // ALWAYS include ETH and USDC at the top for instant access
+            const instantTokens = [];
+
+            // Always add ETH first (even with 0 balance)
+            const ethToken = {
+                symbol: 'ETH',
+                name: 'Ethereum',
+                address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+                decimals: 18,
+                icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMzQzNDM0QiLz4KPHBhdGggZD0iTTguNzUgMTYuNDM3NUwxNS45Mzc1IDQuNUwxNi4wNjI1IDQuNUwyMy4yNSAxNi40Mzc1TDE2LjA2MjUgMjAuMzc1TDguNzUgMTYuNDM3NVoiIGZpbGw9IndoaXRlIiBmaWxsLW9wYWNpdHk9IjAuNiIvPgo8cGF0aCBkPSJNOC43NSAxOC4zNzVMMTYgMjcuNUwyMy4yNSAxOC4zNzVMMTYgMjIuMzEyNUw4Ljc1IDE4LjM3NVoiIGZpbGw9IndoaXRlIi8+Cjwvc3ZnPgo=',
+                balance: '...',
+                wallet: true,
+                verified: true,
+                popular: true,
+                custom: false,
+                usdValue: 0,
+                formattedUsdValue: '...',
+                isInstantPlaceholder: true, // Flag to identify placeholder
+                truncatedAddress: truncateAddress('0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE')
+            };
+
+            // Always add USDC second (even with 0 balance)
+            const usdcToken = {
+                symbol: 'USDC',
+                name: 'USD Coin',
+                address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+                decimals: 6,
+                icon: 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPGNpcmNsZSBjeD0iMTYiIGN5PSIxNiIgcj0iMTYiIGZpbGw9IiMyNzc1Q0EiLz4KPHRleHQgeD0iMTYiIHk9IjIxIiB0ZXh0LWFuY2hvcj0ibWlkZGxlIiBmaWxsPSJ3aGl0ZSIgZm9udC1zaXplPSIxMiIgZm9udC13ZWlnaHQ9IjYwMCI+VVNEPC90ZXh0Pgo8L3N2Zz4K',
+                balance: '...',
+                wallet: true,
+                verified: true,
+                popular: true,
+                custom: false,
+                usdValue: 0,
+                formattedUsdValue: '...',
+                isInstantPlaceholder: true, // Flag to identify placeholder
+                truncatedAddress: truncateAddress('0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913')
+            };
+
+            // Check if we have real data for ETH/USDC and use that instead
+            const realEth = walletTokensInstant.find(t => t.symbol === 'ETH' && !t.isInstantPlaceholder);
+            const realUsdc = walletTokensInstant.find(t => t.symbol === 'USDC' && !t.isInstantPlaceholder);
+
+            instantTokens.push(realEth || ethToken);
+            instantTokens.push(realUsdc || usdcToken);
+
+            // Add other wallet tokens (excluding ETH/USDC to avoid duplicates)
+            const otherTokens = walletTokensInstant.filter(t =>
+                t.symbol !== 'ETH' &&
+                t.symbol !== 'USDC' &&
+                !t.isInstantPlaceholder
+            );
+
+            instantTokens.push(...otherTokens);
+
+            return instantTokens;
         }
 
         // Setup background refresh timer
@@ -1357,11 +1411,11 @@
                     });
 
                     console.log(`💎 FINAL WALLET ORDER:`, walletTokensInstant.map(t => `${t.symbol} ($${(t.usdValue || 0).toFixed(2)})`));
+                }
 
-                    // Update token list display if modal is open
-                    if (document.getElementById('tokenModal').style.display === 'block') {
-                        renderTokenList(document.getElementById('tokenSearch').value);
-                    }
+                // ALWAYS update UI when new data comes in (even partial updates)
+                if (document.getElementById('tokenModal').style.display === 'block') {
+                    renderTokenList(document.getElementById('tokenSearch').value);
                 }
 
                 // Mark as loaded
