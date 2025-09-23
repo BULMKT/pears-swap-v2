@@ -308,6 +308,11 @@ app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
 });
 
+// Serve development page for testing new features
+app.get('/dev', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'dev.html'));
+});
+
 // OPTIMIZED endpoint with keep-alive and performance improvements
 app.post('/api/fresh-swap-optimized', async (req, res) => {
   const startTime = Date.now();
