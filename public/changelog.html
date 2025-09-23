@@ -1,0 +1,430 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Changelog - PEARS</title>
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: radial-gradient(ellipse at top, #0f0f0f 0%, #000000 100%);
+            color: white;
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            height: 120px;
+            width: auto;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            transition: color 0.3s ease;
+        }
+
+        .nav-link:hover {
+            color: #FE745B;
+        }
+
+        .nav-link.active {
+            color: #FE745B;
+        }
+
+        .mobile-logo-container {
+            display: none;
+            text-align: center;
+            padding: 24px 0 0 0;
+            margin-bottom: -60px;
+            position: relative;
+        }
+
+        .mobile-logo {
+            height: 200px;
+            position: relative;
+            left: -30px;
+        }
+
+        /* Hero Section */
+        .hero {
+            text-align: center;
+            padding: 20px 20px 60px;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .hero h1 {
+            font-size: 72px;
+            font-weight: 800;
+            background: linear-gradient(135deg, #FE745B 0%, #FF9A85 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 24px;
+            letter-spacing: -2px;
+        }
+
+        .hero-subtitle {
+            font-size: 24px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 40px;
+        }
+
+        /* Changelog Content */
+        .changelog-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 0 40px 80px;
+        }
+
+        .changelog-item {
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 32px;
+            margin-bottom: 24px;
+            transition: all 0.3s ease;
+        }
+
+        .changelog-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(254, 116, 91, 0.3);
+            transform: translateY(-2px);
+        }
+
+        .changelog-date {
+            font-size: 14px;
+            color: #FE745B;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .changelog-title {
+            font-size: 24px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            color: white;
+        }
+
+        .changelog-description {
+            font-size: 16px;
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 20px;
+        }
+
+        .changelog-features {
+            list-style: none;
+            padding: 0;
+        }
+
+        .changelog-features li {
+            font-size: 15px;
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 8px;
+            padding-left: 24px;
+            position: relative;
+        }
+
+        .changelog-features li:before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #4CAF50;
+            font-weight: bold;
+        }
+
+        .version-badge {
+            display: inline-block;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+            margin-left: 12px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(0, 0, 0, 0.3);
+            padding: 40px 0;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 40px;
+            display: grid;
+            grid-template-columns: 2fr 1fr 1fr 1fr;
+            gap: 40px;
+        }
+
+        .footer-section h3 {
+            color: #FE745B;
+            margin-bottom: 16px;
+            font-size: 18px;
+        }
+
+        .footer-section p {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 16px;
+        }
+
+        .footer-links {
+            list-style: none;
+        }
+
+        .footer-links li {
+            margin-bottom: 8px;
+        }
+
+        .footer-links a {
+            color: rgba(255, 255, 255, 0.7);
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-links a:hover {
+            color: #FE745B;
+        }
+
+        .social-links {
+            display: flex;
+            gap: 16px;
+            margin-top: 16px;
+        }
+
+        .social-links a {
+            width: 40px;
+            height: 40px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .social-links a:hover {
+            background: #FE745B;
+            transform: translateY(-2px);
+        }
+
+        .footer-bottom {
+            text-align: center;
+            margin-top: 40px;
+            padding-top: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                flex-direction: column;
+                align-items: center;
+                padding: 20px;
+            }
+
+            .header-right {
+                margin-top: 20px;
+                gap: 16px;
+            }
+
+            .mobile-logo-container {
+                display: block;
+            }
+
+            .logo {
+                display: none;
+            }
+
+            .hero h1 {
+                font-size: 48px;
+            }
+
+            .hero-subtitle {
+                font-size: 20px;
+            }
+
+            .changelog-content {
+                padding: 0 20px 60px;
+            }
+
+            .changelog-item {
+                padding: 24px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 30px;
+                padding: 0 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Header -->
+    <div class="header">
+        <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
+        <div class="header-right">
+            <a href="/" class="nav-link">Live</a>
+            <a href="/dev" class="nav-link">Dev</a>
+            <a href="/roadmap" class="nav-link">Roadmap</a>
+            <a href="/technology" class="nav-link">Technology</a>
+            <a href="/changelog" class="nav-link active">Changelog</a>
+        </div>
+    </div>
+
+    <!-- Mobile Logo -->
+    <div class="mobile-logo-container">
+        <img src="Logo Pears.png" alt="PEARS" class="mobile-logo">
+    </div>
+
+    <!-- Hero Section -->
+    <div class="hero">
+        <h1>Changelog</h1>
+        <p class="hero-subtitle">Track our progress and see how we're making PEARS better every day</p>
+    </div>
+
+    <!-- Changelog Content -->
+    <div class="changelog-content">
+
+        <div class="changelog-item">
+            <div class="changelog-date">September 23, 2025</div>
+            <h2 class="changelog-title">Enhanced Token Selector <span class="version-badge">v2.1</span></h2>
+            <p class="changelog-description">Major improvements to token selection experience based on user feedback</p>
+            <ul class="changelog-features">
+                <li>Real-time ETH pricing that stays current with market rates</li>
+                <li>Smart token sorting - ETH always appears first, followed by highest value holdings</li>
+                <li>Instant token visibility - no more waiting for ETH to load</li>
+                <li>Improved approve-then-swap workflow for smoother transactions</li>
+                <li>Performance optimizations for faster loading</li>
+            </ul>
+        </div>
+
+        <div class="changelog-item">
+            <div class="changelog-date">September 22, 2025</div>
+            <h2 class="changelog-title">Advanced Wallet Integration <span class="version-badge">v2.0</span></h2>
+            <p class="changelog-description">Enhanced wallet connectivity and token detection capabilities</p>
+            <ul class="changelog-features">
+                <li>Real-time wallet token scanning across Base network</li>
+                <li>Professional-grade security with enhanced verification</li>
+                <li>Improved mobile navigation and responsive design</li>
+                <li>Performance optimizations across all pages</li>
+                <li>Better error handling and user feedback</li>
+            </ul>
+        </div>
+
+        <div class="changelog-item">
+            <div class="changelog-date">September 21, 2025</div>
+            <h2 class="changelog-title">Technology Showcase & Platform Refinements</h2>
+            <p class="changelog-description">New technology page and comprehensive UX improvements</p>
+            <ul class="changelog-features">
+                <li>New Technology page showcasing PEARS technical excellence</li>
+                <li>Updated branding from "Pears Swap" to "PEARS" with new tagline "Ripen & Reward"</li>
+                <li>Terms of Service page added for transparency</li>
+                <li>Consistent footer design across all pages</li>
+                <li>Mobile layout optimizations for iOS compatibility</li>
+                <li>Critical swap execution improvements</li>
+            </ul>
+        </div>
+
+        <div class="changelog-item">
+            <div class="changelog-date">September 20-21, 2025</div>
+            <h2 class="changelog-title">PEARS V3 Launch <span class="version-badge">v3.0</span></h2>
+            <p class="changelog-description">Complete platform redesign with multi-token support and professional UI</p>
+            <ul class="changelog-features">
+                <li>Multi-token DEX supporting all Base network tokens</li>
+                <li>Complete UI/UX redesign with modern, professional interface</li>
+                <li>Base chain integration with optimized performance</li>
+                <li>Elite production standards with competitive 0.08% fees</li>
+                <li>Mobile-first responsive design</li>
+                <li>Professional wallet connectivity and transaction handling</li>
+            </ul>
+        </div>
+
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-section">
+                <h3>PEARS</h3>
+                <p>The fastest, most reliable DEX on Base. Ripen & Reward with every swap.</p>
+                <div class="social-links">
+                    <a href="#" onclick="showComingSoon()">𝕏</a>
+                    <a href="#" onclick="showComingSoon()">📱</a>
+                    <a href="#" onclick="showComingSoon()">📧</a>
+                </div>
+            </div>
+            <div class="footer-section">
+                <h3>Platform</h3>
+                <ul class="footer-links">
+                    <li><a href="/">Swap</a></li>
+                    <li><a href="/roadmap">Roadmap</a></li>
+                    <li><a href="/technology">Technology</a></li>
+                    <li><a href="/changelog">Changelog</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Resources</h3>
+                <ul class="footer-links">
+                    <li><a href="#" onclick="showComingSoon()">Documentation</a></li>
+                    <li><a href="#" onclick="showComingSoon()">Support</a></li>
+                    <li><a href="#" onclick="showComingSoon()">API</a></li>
+                    <li><a href="#" onclick="showComingSoon()">Status</a></li>
+                </ul>
+            </div>
+            <div class="footer-section">
+                <h3>Legal</h3>
+                <ul class="footer-links">
+                    <li><a href="/terms">Terms of Service</a></li>
+                    <li><a href="#" onclick="showComingSoon()">Privacy Policy</a></li>
+                    <li><a href="#" onclick="showComingSoon()">Cookie Policy</a></li>
+                </ul>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <p>&copy; 2025 PEARS. Built on Base.</p>
+        </div>
+    </div>
+
+    <script>
+        function showComingSoon() {
+            alert('Coming soon! We\'re working hard to bring you more features.');
+        }
+    </script>
+</body>
+</html>
