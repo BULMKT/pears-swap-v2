@@ -44,6 +44,10 @@
       "dest": "/server.js"
     },
     {
+      "src": "/dev",
+      "dest": "/server.js"
+    },
+    {
       "src": "/technology",
       "dest": "/server.js"
     },
