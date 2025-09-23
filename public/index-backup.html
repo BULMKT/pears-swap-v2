@@ -1,0 +1,1466 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PEARS - Swap on Base</title>
+    <link rel="preconnect" href="https://api.0x.org">
+    <link rel="dns-prefetch" href="//api.0x.org">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/ethers@6.7.0/dist/ethers.umd.min.js"></script>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
+            color: white;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        .container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+        }
+
+        /* Background Effects */
+        .bg-effect {
+            position: absolute;
+            width: 400px;
+            height: 400px;
+            background: radial-gradient(circle, rgba(254, 116, 91, 0.08) 0%, transparent 70%);
+            border-radius: 50%;
+            top: 10%;
+            right: 5%;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .bg-effect-2 {
+            position: absolute;
+            width: 300px;
+            height: 300px;
+            background: radial-gradient(circle, rgba(254, 116, 91, 0.05) 0%, transparent 70%);
+            border-radius: 50%;
+            bottom: 20%;
+            left: 10%;
+            animation: float 12s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0px) rotate(0deg); }
+            50% { transform: translateY(-20px) rotate(5deg); }
+        }
+
+        /* Header */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            padding: 20px 40px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .logo {
+            height: 120px;
+            width: auto;
+        }
+
+        .header-right {
+            display: flex;
+            align-items: center;
+            gap: 24px;
+            margin-top: 20px;
+        }
+
+        .nav-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            padding: 8px 16px;
+            border-radius: 8px;
+        }
+
+        .nav-link:hover, .nav-link.active {
+            color: #FE745B;
+            background: rgba(254, 116, 91, 0.1);
+        }
+
+        .connect-wallet {
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .connect-wallet.not-connected {
+            animation: subtleGlow 3s ease-in-out infinite;
+        }
+
+        @keyframes subtleGlow {
+            0%, 100% {
+                box-shadow: 0 0 10px rgba(254, 116, 91, 0.3);
+            }
+            50% {
+                box-shadow: 0 0 20px rgba(254, 116, 91, 0.5);
+            }
+        }
+
+        .connect-wallet:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(254, 116, 91, 0.4);
+        }
+
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            position: relative;
+        }
+
+        /* Swap Container */
+        .swap-container {
+            background: rgba(255, 255, 255, 0.05);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 24px;
+            padding: 32px;
+            width: 100%;
+            max-width: 480px;
+            position: relative;
+        }
+
+        .swap-header {
+            text-align: center;
+            margin-bottom: 32px;
+        }
+
+        .swap-title {
+            font-size: 28px;
+            font-weight: 700;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 8px;
+        }
+
+        .swap-subtitle {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 16px;
+        }
+
+        /* Token Input */
+        .token-input {
+            background: rgba(255, 255, 255, 0.08);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 16px;
+            padding: 20px;
+            margin-bottom: 16px;
+            position: relative;
+        }
+
+        .token-input-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+
+        .token-label {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .token-balance {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 14px;
+        }
+
+        .token-input-main {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+            padding-right: 0px;
+        }
+
+        .amount-input {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            font-weight: 600;
+            flex: 1;
+            outline: none;
+            min-width: 0;
+        }
+
+        .amount-input::placeholder {
+            color: rgba(255, 255, 255, 0.3);
+        }
+
+        .token-selector {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 8px 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: none;
+            color: white;
+            font-weight: 500;
+            flex-shrink: 0;
+        }
+
+        .token-selector:hover {
+            background: rgba(255, 255, 255, 0.15);
+        }
+
+        .token-icon {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: #FE745B;
+            object-fit: cover;
+        }
+
+        /* Switch Button */
+        .switch-container {
+            display: flex;
+            justify-content: center;
+            margin: 8px 0;
+            position: relative;
+        }
+
+        .switch-button {
+            background: rgba(255, 255, 255, 0.1);
+            border: 2px solid rgba(254, 116, 91, 0.3);
+            border-radius: 12px;
+            width: 48px;
+            height: 48px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            color: white;
+            font-size: 18px;
+        }
+
+        .switch-button:hover {
+            border-color: #FE745B;
+            background: rgba(254, 116, 91, 0.1);
+            transform: rotate(180deg);
+        }
+
+        /* Swap Button */
+        .swap-button {
+            width: 100%;
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            border: none;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 24px;
+        }
+
+        .swap-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(254, 116, 91, 0.4);
+        }
+
+        .swap-button:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        /* Status Message */
+        .status-message {
+            margin-top: 16px;
+            padding: 12px 16px;
+            border-radius: 12px;
+            text-align: center;
+            font-size: 14px;
+            display: none;
+            position: relative;
+        }
+
+        .status-message.success {
+            background: rgba(34, 197, 94, 0.1);
+            border: 1px solid rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .status-message.error {
+            background: rgba(239, 68, 68, 0.1);
+            border: 1px solid rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .status-message.info {
+            background: rgba(59, 130, 246, 0.1);
+            border: 1px solid rgba(59, 130, 246, 0.3);
+            color: #3b82f6;
+        }
+
+        .status-message a {
+            color: #FE745B;
+            text-decoration: none;
+            font-weight: 500;
+        }
+
+        .status-message a:hover {
+            text-decoration: underline;
+        }
+
+        .close-status {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: currentColor;
+            opacity: 0.6;
+            cursor: pointer;
+            font-size: 18px;
+            line-height: 1;
+            padding: 0;
+            width: 20px;
+            height: 20px;
+        }
+
+        .close-status:hover {
+            opacity: 1;
+        }
+
+        /* Main Content Spacing */
+        .main-content {
+            margin-bottom: 80px;
+        }
+
+        /* Footer */
+        .footer {
+            background: rgba(255, 255, 255, 0.02);
+            border-top: 1px solid rgba(254, 116, 91, 0.1);
+            padding: 60px 40px 40px;
+            margin-top: 80px;
+        }
+
+        .footer-content {
+            max-width: 1200px;
+            margin: 0 auto;
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 60px;
+            align-items: start;
+        }
+
+        .footer-socials h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .social-icons {
+            display: flex;
+            gap: 16px;
+        }
+
+        .social-icon {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 40px;
+            height: 40px;
+            padding: 0 12px;
+            background: rgba(254, 116, 91, 0.1);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 8px;
+            color: #FE745B;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            white-space: nowrap;
+        }
+
+        .social-icon:hover {
+            background: rgba(254, 116, 91, 0.2);
+            transform: translateY(-2px);
+        }
+
+        .footer-links h3 {
+            color: #FE745B;
+            font-size: 18px;
+            margin-bottom: 24px;
+            font-weight: 600;
+        }
+
+        .footer-links-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .footer-link {
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            font-size: 16px;
+            transition: color 0.3s ease;
+            cursor: pointer;
+        }
+
+        .footer-link:hover {
+            color: #FE745B;
+        }
+
+        /* Coming Soon Modal */
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 2000;
+            backdrop-filter: blur(10px);
+        }
+
+        .modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 16px;
+            padding: 40px;
+            text-align: center;
+            max-width: 400px;
+            width: 90%;
+        }
+
+        .modal h3 {
+            color: #FE745B;
+            font-size: 24px;
+            margin-bottom: 16px;
+        }
+
+        .modal p {
+            color: rgba(255, 255, 255, 0.8);
+            margin-bottom: 24px;
+        }
+
+        .modal-close {
+            background: linear-gradient(45deg, #FE745B, #FF8A6B);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .modal-close:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Token Modal */
+        .token-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            backdrop-filter: blur(10px);
+        }
+
+        .token-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(254, 116, 91, 0.2);
+            border-radius: 20px;
+            padding: 24px;
+            width: 90%;
+            max-width: 400px;
+            max-height: 500px;
+        }
+
+        .token-modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .token-modal-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: white;
+        }
+
+        .close-modal {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 24px;
+            cursor: pointer;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .close-modal:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .token-search {
+            width: 100%;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 12px;
+            padding: 12px 16px;
+            color: white;
+            font-size: 16px;
+            outline: none;
+            margin-bottom: 16px;
+        }
+
+        .token-search::placeholder {
+            color: rgba(255, 255, 255, 0.5);
+        }
+
+        .token-list {
+            max-height: 300px;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .token-list::-webkit-scrollbar {
+            display: none;
+        }
+
+        .token-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .token-item:hover {
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .token-item-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #FE745B;
+            object-fit: cover;
+        }
+
+        .token-item-info {
+            flex: 1;
+        }
+
+        .token-item-symbol {
+            font-weight: 600;
+            color: white;
+            font-size: 16px;
+        }
+
+        .token-item-name {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 14px;
+        }
+
+        /* Mobile Logo */
+        .mobile-logo-container {
+            display: none;
+            text-align: center;
+            padding: 24px 0 0 0;
+            margin-bottom: -60px;
+            position: relative;
+        }
+
+        .mobile-logo {
+            height: 200px;
+            position: relative;
+            left: -30px;
+        }
+
+        /* Mobile Responsive */
+        @media (max-width: 768px) {
+            .header {
+                padding: 16px 20px;
+                justify-content: center;
+                align-items: center;
+            }
+
+            .logo {
+                display: none;
+            }
+
+            .header-right {
+                gap: 16px;
+                margin-top: 0;
+                justify-content: center;
+                flex-wrap: wrap;
+            }
+
+            .mobile-logo-container {
+                display: block;
+            }
+
+            .nav-link {
+                font-size: 14px;
+                padding: 6px 12px;
+            }
+
+            .connect-wallet {
+                padding: 10px 20px;
+                font-size: 14px;
+            }
+
+            .main-content {
+                padding: 20px 16px;
+            }
+
+            .swap-container {
+                padding: 24px;
+            }
+
+            .swap-title {
+                font-size: 24px;
+            }
+
+            .amount-input {
+                font-size: 20px;
+            }
+
+            .token-modal-content {
+                width: 95%;
+                padding: 20px;
+            }
+
+            .footer-content {
+                grid-template-columns: 1fr;
+                gap: 40px;
+                text-align: center;
+            }
+
+            .footer {
+                padding: 40px 20px 30px;
+            }
+
+            .social-icons {
+                justify-content: center;
+                gap: 8px;
+                flex-wrap: wrap;
+            }
+
+            .social-icon {
+                font-size: 12px;
+                min-width: 35px;
+                height: 35px;
+                padding: 0 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Background Effects -->
+        <div class="bg-effect"></div>
+        <div class="bg-effect-2"></div>
+
+        <!-- Header -->
+        <div class="header">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="logo"></a>
+            <div class="header-right">
+                <a href="/" class="nav-link active">Swap</a>
+                <a href="/roadmap" class="nav-link">Roadmap</a>
+                <button class="connect-wallet not-connected" id="connectWallet">Connect Base Wallet</button>
+            </div>
+        </div>
+
+        <!-- Mobile Logo -->
+        <div class="mobile-logo-container">
+            <a href="/"><img src="Logo Pears.png" alt="PEARS" class="mobile-logo"></a>
+        </div>
+
+        <!-- Main Content -->
+        <div class="main-content">
+            <div class="swap-container">
+                <div class="swap-header">
+                    <h1 class="swap-title">Swap on Base</h1>
+                    <p class="swap-subtitle">Lightning fast • 0.08% fees • MEV protected</p>
+                </div>
+
+                <!-- From Token -->
+                <div class="token-input">
+                    <div class="token-input-header">
+                        <span class="token-label">From</span>
+                        <span class="token-balance" id="fromBalance">Balance: 0</span>
+                    </div>
+                    <div class="token-input-main">
+                        <input type="text" class="amount-input" id="fromAmount" placeholder="0">
+                        <button class="token-selector" id="fromTokenSelector">
+                            <img class="token-icon" id="fromTokenIcon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png" alt="ETH">
+                            <span id="fromTokenSymbol">ETH</span>
+                            <span>▼</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Switch Button -->
+                <div class="switch-container">
+                    <button class="switch-button" id="switchTokens">⇅</button>
+                </div>
+
+                <!-- To Token -->
+                <div class="token-input">
+                    <div class="token-input-header">
+                        <span class="token-label">To</span>
+                        <span class="token-balance" id="toBalance">Balance: 0</span>
+                    </div>
+                    <div class="token-input-main">
+                        <input type="text" class="amount-input" id="toAmount" placeholder="0" readonly>
+                        <button class="token-selector" id="toTokenSelector">
+                            <img class="token-icon" id="toTokenIcon" src="https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png" alt="USDC">
+                            <span id="toTokenSymbol">USDC</span>
+                            <span>▼</span>
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Swap Button -->
+                <button class="swap-button" id="swapButton" disabled>Connect Wallet</button>
+
+                <!-- Status Message -->
+                <div class="status-message" id="statusMessage"></div>
+            </div>
+        </div>
+
+        <!-- Token Selection Modal -->
+        <div class="token-modal" id="tokenModal">
+            <div class="token-modal-content">
+                <div class="token-modal-header">
+                    <span class="token-modal-title">Select Token</span>
+                    <button class="close-modal" id="closeModal">×</button>
+                </div>
+                <input type="text" class="token-search" id="tokenSearch" placeholder="Search tokens or paste address">
+                <div class="token-list" id="tokenList"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Global variables
+        let provider = null;
+        let signer = null;
+        let userAddress = null;
+        let currentTokenSelection = null; // 'from' or 'to'
+
+        // Base network configuration
+        const BASE_CHAIN_ID = '0x2105'; // 8453 in hex
+        const BASE_RPC_URL = 'https://mainnet.base.org';
+
+        // Token list for Base network with icons
+        const BASE_TOKENS = [
+            {
+                symbol: 'ETH',
+                name: 'Ethereum',
+                address: '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE',
+                decimals: 18,
+                icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+            },
+            {
+                symbol: 'USDC',
+                name: 'USD Coin',
+                address: '0x833589fCD6eDb6E08f4c7C32D4f71b54bdA02913',
+                decimals: 6,
+                icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48/logo.png'
+            },
+            {
+                symbol: 'WETH',
+                name: 'Wrapped Ethereum',
+                address: '0x4200000000000000000000000000000000000006',
+                decimals: 18,
+                icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0xC02aaA39b223FE8D0A0e5C4F27eAD9083C756Cc2/logo.png'
+            },
+            {
+                symbol: 'DAI',
+                name: 'Dai Stablecoin',
+                address: '0x50c5725949A6F0c72E6C4a641F24049A917DB0Cb',
+                decimals: 18,
+                icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/ethereum/assets/0x6B175474E89094C44Da98b954EedeAC495271d0F/logo.png'
+            }
+        ];
+
+        // Function to get token icon with fallback
+        function getTokenIcon(address) {
+            // Try multiple sources
+            const token = BASE_TOKENS.find(t => t.address.toLowerCase() === address.toLowerCase());
+            if (token?.icon) return token.icon;
+
+            // Fallback to blockchain explorers or token lists
+            // For Base chain tokens, we can use various sources
+            return `https://raw.githubusercontent.com/base-org/brand-kit/main/logo/symbol/Base_Symbol_Blue.png`;
+        }
+
+        // Current token selection
+        let fromToken = BASE_TOKENS[0]; // ETH
+        let toToken = BASE_TOKENS[1]; // USDC
+
+        // Connect wallet functionality
+        async function connectWallet() {
+            try {
+                if (typeof window.ethereum === 'undefined') {
+                    showStatus('Please install MetaMask!', 'error');
+                    return;
+                }
+
+                // Request account access
+                await window.ethereum.request({ method: 'eth_requestAccounts' });
+
+                // Switch to Base network
+                try {
+                    await window.ethereum.request({
+                        method: 'wallet_switchEthereumChain',
+                        params: [{ chainId: BASE_CHAIN_ID }],
+                    });
+                } catch (switchError) {
+                    if (switchError.code === 4902) {
+                        await window.ethereum.request({
+                            method: 'wallet_addEthereumChain',
+                            params: [{
+                                chainId: BASE_CHAIN_ID,
+                                chainName: 'Base',
+                                nativeCurrency: { name: 'ETH', symbol: 'ETH', decimals: 18 },
+                                rpcUrls: [BASE_RPC_URL],
+                                blockExplorerUrls: ['https://basescan.org/']
+                            }]
+                        });
+                    }
+                }
+
+                provider = new ethers.BrowserProvider(window.ethereum);
+                signer = await provider.getSigner();
+                userAddress = await signer.getAddress();
+
+                const walletButton = document.getElementById('connectWallet');
+                walletButton.textContent = `${userAddress.slice(0, 6)}...${userAddress.slice(-4)}`;
+                walletButton.classList.remove('not-connected');
+                document.getElementById('swapButton').textContent = 'Enter Amount';
+                document.getElementById('swapButton').disabled = false;
+
+                await updateBalances();
+                showStatus('Wallet connected successfully!', 'success');
+            } catch (error) {
+                console.error('Error connecting wallet:', error);
+                showStatus('Failed to connect wallet', 'error');
+            }
+        }
+
+        // Update token balances
+        async function updateBalances() {
+            if (!provider || !userAddress) return;
+
+            try {
+                // Update from token balance
+                const fromBalance = await getTokenBalance(fromToken.address, userAddress);
+                document.getElementById('fromBalance').textContent = `Balance: ${fromBalance}`;
+
+                // Update to token balance
+                const toBalance = await getTokenBalance(toToken.address, userAddress);
+                document.getElementById('toBalance').textContent = `Balance: ${toBalance}`;
+            } catch (error) {
+                console.error('Error updating balances:', error);
+            }
+        }
+
+        // Get token balance
+        async function getTokenBalance(tokenAddress, userAddress) {
+            if (tokenAddress === '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+                // ETH balance
+                const balance = await provider.getBalance(userAddress);
+                return parseFloat(ethers.formatEther(balance)).toFixed(4);
+            } else {
+                // ERC20 token balance
+                const contract = new ethers.Contract(tokenAddress, [
+                    'function balanceOf(address) view returns (uint256)',
+                    'function decimals() view returns (uint8)'
+                ], provider);
+
+                const balance = await contract.balanceOf(userAddress);
+                const decimals = await contract.decimals();
+                return parseFloat(ethers.formatUnits(balance, decimals)).toFixed(4);
+            }
+        }
+
+        // Token selection modal
+        function openTokenModal(type) {
+            currentTokenSelection = type;
+            const modal = document.getElementById('tokenModal');
+            const tokenList = document.getElementById('tokenList');
+
+            // Clear and populate token list
+            tokenList.innerHTML = '';
+            BASE_TOKENS.forEach(token => {
+                const tokenItem = document.createElement('div');
+                tokenItem.className = 'token-item';
+                tokenItem.innerHTML = `
+                    <img class="token-item-icon" src="${token.icon}" alt="${token.symbol}" onerror="this.src='data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMzIiIGhlaWdodD0iMzIiIHZpZXdCb3g9IjAgMCAzMiAzMiIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48Y2lyY2xlIGN4PSIxNiIgY3k9IjE2IiByPSIxNiIgZmlsbD0iI0ZFNzQ1QiIvPjx0ZXh0IHg9IjE2IiB5PSIyMSIgZm9udC1mYW1pbHk9IkludGVyIiBmb250LXNpemU9IjEyIiBmaWxsPSJ3aGl0ZSIgdGV4dC1hbmNob3I9Im1pZGRsZSI+JHt0b2tlbi5zeW1ib2wuc2xpY2UoMCwgMil9PC90ZXh0Pjwvc3ZnPg=='">
+                    <div class="token-item-info">
+                        <div class="token-item-symbol">${token.symbol}</div>
+                        <div class="token-item-name">${token.name}</div>
+                    </div>
+                `;
+                tokenItem.onclick = () => selectToken(token);
+                tokenList.appendChild(tokenItem);
+            });
+
+            modal.style.display = 'block';
+        }
+
+        function closeTokenModal() {
+            document.getElementById('tokenModal').style.display = 'none';
+        }
+
+        function selectToken(token) {
+            if (currentTokenSelection === 'from') {
+                fromToken = token;
+                document.getElementById('fromTokenSymbol').textContent = token.symbol;
+                document.getElementById('fromTokenIcon').src = token.icon;
+                document.getElementById('fromTokenIcon').alt = token.symbol;
+            } else {
+                toToken = token;
+                document.getElementById('toTokenSymbol').textContent = token.symbol;
+                document.getElementById('toTokenIcon').src = token.icon;
+                document.getElementById('toTokenIcon').alt = token.symbol;
+            }
+
+            closeTokenModal();
+            updateBalances();
+
+            // Get new quote if there's an amount
+            const fromAmount = document.getElementById('fromAmount').value;
+            if (fromAmount && parseFloat(fromAmount) > 0) {
+                getQuote();
+            }
+        }
+
+        // Switch tokens
+        function switchTokens() {
+            const tempToken = fromToken;
+            fromToken = toToken;
+            toToken = tempToken;
+
+            document.getElementById('fromTokenSymbol').textContent = fromToken.symbol;
+            document.getElementById('toTokenSymbol').textContent = toToken.symbol;
+            document.getElementById('fromTokenIcon').src = fromToken.icon;
+            document.getElementById('toTokenIcon').src = toToken.icon;
+            document.getElementById('fromTokenIcon').alt = fromToken.symbol;
+            document.getElementById('toTokenIcon').alt = toToken.symbol;
+
+            // Swap the amounts too
+            const fromAmount = document.getElementById('fromAmount').value;
+            const toAmount = document.getElementById('toAmount').value;
+            document.getElementById('fromAmount').value = toAmount;
+            document.getElementById('toAmount').value = fromAmount;
+
+            updateBalances();
+
+            // Get new quote if there's an amount
+            if (document.getElementById('fromAmount').value) {
+                getQuote();
+            }
+        }
+
+        // Show status message with optional close button
+        function showStatus(message, type, persistent = false) {
+            const statusElement = document.getElementById('statusMessage');
+
+            // Add close button for success messages
+            if (type === 'success' && persistent) {
+                statusElement.innerHTML = `
+                    ${message}
+                    <button class="close-status" onclick="closeStatus()">×</button>
+                `;
+            } else {
+                statusElement.innerHTML = message;
+            }
+
+            statusElement.className = `status-message ${type}`;
+            statusElement.style.display = 'block';
+
+            // Auto-hide non-persistent messages
+            if (!persistent) {
+                setTimeout(() => {
+                    statusElement.style.display = 'none';
+                }, 5000);
+            }
+        }
+
+        // Close status message
+        function closeStatus() {
+            document.getElementById('statusMessage').style.display = 'none';
+        }
+
+        // Get quote for swap with TTL guard
+        let quoteTimeout = null;
+        let lastQuote = null;
+        let lastQuoteTime = 0;
+
+        async function getQuote() {
+            const fromAmount = document.getElementById('fromAmount').value;
+
+            if (!fromAmount || parseFloat(fromAmount) <= 0) {
+                document.getElementById('toAmount').value = '';
+                lastQuote = null;
+                lastQuoteTime = 0;
+                return;
+            }
+
+            try {
+                // Convert amount to smallest unit
+                const sellAmount = ethers.parseUnits(fromAmount, fromToken.decimals).toString();
+
+                // Use V3 quote endpoint
+                const response = await fetch('/api/v3-quote', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        sellToken: fromToken.address,
+                        buyToken: toToken.address,
+                        sellAmount: sellAmount,
+                        taker: userAddress || '0x0000000000000000000000000000000000000000'
+                    })
+                });
+
+                const quote = await response.json();
+
+                if (quote.buyAmount) {
+                    const buyAmount = ethers.formatUnits(quote.buyAmount, toToken.decimals);
+                    document.getElementById('toAmount').value = parseFloat(buyAmount).toFixed(6);
+
+                    // Store quote with timestamp for TTL guard
+                    lastQuote = quote;
+                    lastQuoteTime = Date.now();
+                }
+            } catch (error) {
+                console.error('Error getting quote:', error);
+            }
+        }
+
+        // TTL guard function - check if quote is too old (>10s)
+        function isQuoteFresh() {
+            if (!lastQuote || !lastQuoteTime) return false;
+            return (Date.now() - lastQuoteTime) < 10000; // 10 seconds
+        }
+
+        // Execute real swap using V3 API
+        async function executeSwap() {
+            if (!signer || !userAddress) {
+                showStatus('Please connect wallet first', 'error');
+                await connectWallet();
+                return;
+            }
+
+            const fromAmount = document.getElementById('fromAmount').value;
+            if (!fromAmount || parseFloat(fromAmount) <= 0) {
+                showStatus('Please enter a valid amount', 'error');
+                return;
+            }
+
+            const btn = document.getElementById('swapButton');
+
+            try {
+                // Step 0: Ensure wallet is fully ready
+                btn.textContent = 'Checking wallet...';
+                btn.disabled = true;
+                showStatus('🔗 Ensuring wallet connectivity...', 'info');
+
+                // Wait for wallet to be fully initialized
+                if (!provider || !signer || !userAddress) {
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    if (!provider || !signer || !userAddress) {
+                        throw new Error('Wallet not properly connected. Please reconnect.');
+                    }
+                }
+
+                // Verify network is correct
+                const network = await provider.getNetwork();
+                if (network.chainId !== 8453n) {
+                    throw new Error('Please switch to Base network');
+                }
+
+                // Step 1: Check if we need a fresh quote (TTL guard)
+                if (!isQuoteFresh()) {
+                    btn.textContent = 'Getting Fresh Quote...';
+                    showStatus('🔄 Getting fresh quote (previous quote expired)...', 'info');
+                    await getQuote(); // Get fresh quote
+                }
+
+                if (!lastQuote) {
+                    btn.textContent = 'Getting Quote...';
+                    showStatus('🔄 Getting quote...', 'info');
+                    await getQuote();
+                }
+
+                if (!lastQuote) {
+                    throw new Error('Failed to get quote');
+                }
+
+                const sellAmount = ethers.parseUnits(fromAmount, fromToken.decimals).toString();
+
+                const response = await fetch('/api/v3-quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellToken: fromToken.address,
+                        buyToken: toToken.address,
+                        sellAmount: sellAmount,
+                        taker: userAddress
+                    })
+                });
+
+                if (!response.ok) throw new Error('Failed to get quote');
+                const swapData = await response.json();
+
+                const buyAmount = ethers.formatUnits(swapData.buyAmount, toToken.decimals);
+                console.log(`✅ Quote: ${fromAmount} ${fromToken.symbol} → ${buyAmount} ${toToken.symbol}`);
+
+                // Step 2: Check if we need token approval for ERC-20 tokens
+                if (fromToken.address !== '0xEeeeeEeeeEeEeeEeEeEeeEEEeeeeEeeeeeeeEEeE') {
+                    // Get the spender address (0x Exchange Proxy for Base)
+                    const spender = swapData.to; // The contract we're sending the transaction to
+
+                    // Check current allowance
+                    const tokenContract = new ethers.Contract(
+                        fromToken.address,
+                        [
+                            'function allowance(address owner, address spender) view returns (uint256)',
+                            'function approve(address spender, uint256 amount) returns (bool)'
+                        ],
+                        provider
+                    );
+
+                    const currentAllowance = await tokenContract.allowance(userAddress, spender);
+                    const requiredAmount = BigInt(sellAmount);
+
+                    // If allowance is insufficient, approve
+                    if (currentAllowance < requiredAmount) {
+                        btn.textContent = 'Approve token...';
+                        showStatus('📱 Please approve token spending in MetaMask', 'info');
+
+                        // Create approval transaction with signer
+                        const tokenContractWithSigner = tokenContract.connect(signer);
+                        const approveTx = await tokenContractWithSigner.approve(
+                            spender,
+                            ethers.MaxUint256 // Approve max amount to avoid future approvals
+                        );
+
+                        btn.textContent = 'Approving...';
+                        showStatus('⏳ Approving token...', 'info');
+                        await approveTx.wait();
+
+                        // Get fresh quote after approval
+                        btn.textContent = 'Getting new quote...';
+                        const retryResponse = await fetch('/api/v3-quote', {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                sellToken: fromToken.address,
+                                buyToken: toToken.address,
+                                sellAmount: sellAmount,
+                                taker: userAddress
+                            })
+                        });
+
+                        if (!retryResponse.ok) throw new Error('Failed to get quote after approval');
+                        swapData = await retryResponse.json();
+                        showStatus('✅ Token approved successfully', 'success');
+                    }
+                }
+
+                // Step 3: Get fresh quote just before execution to avoid stale data
+                btn.textContent = 'Getting final quote...';
+                const finalQuoteResponse = await fetch('/api/v3-quote', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        sellToken: fromToken.address,
+                        buyToken: toToken.address,
+                        sellAmount: sellAmount,
+                        taker: userAddress
+                    })
+                });
+
+                if (!finalQuoteResponse.ok) throw new Error('Failed to get final quote');
+                const finalSwapData = await finalQuoteResponse.json();
+
+                // Step 4: Execute transaction with fresh data
+                btn.textContent = 'Confirming swap...';
+                showStatus('📱 Please confirm the swap in MetaMask', 'info');
+
+                const txParams = {
+                    to: finalSwapData.to,
+                    data: finalSwapData.data,
+                    value: BigInt(finalSwapData.value || '0')
+                };
+
+                // Simulate transaction first to catch reverts early
+                try {
+                    await provider.call({
+                        ...txParams,
+                        from: userAddress
+                    });
+                } catch (simulationError) {
+                    console.error('Transaction simulation failed:', simulationError);
+                    throw new Error(`Transaction would fail: ${simulationError.message}`);
+                }
+
+                // Estimate gas with buffer
+                const gasEstimate = await provider.estimateGas({
+                    ...txParams,
+                    from: userAddress
+                });
+                const gasLimit = gasEstimate + (gasEstimate / 5n); // Add 20% buffer
+
+                // Send transaction
+                btn.textContent = 'Processing...';
+                const tx = await signer.sendTransaction({
+                    ...txParams,
+                    gasLimit: gasLimit
+                });
+
+                showStatus('⏳ Swap processing...', 'info');
+
+                // Wait for confirmation
+                btn.textContent = 'Finalizing...';
+                const receipt = await tx.wait();
+
+                if (receipt.status === 1) {
+                    showStatus(
+                        `✅ Swap successful! <a href="https://basescan.org/tx/${tx.hash}" target="_blank">View transaction</a>`,
+                        'success',
+                        true // Make it persistent with close button
+                    );
+                    // Clear inputs and update balances
+                    document.getElementById('fromAmount').value = '';
+                    document.getElementById('toAmount').value = '';
+                    await updateBalances();
+                } else {
+                    throw new Error('Transaction failed');
+                }
+
+                btn.textContent = 'Swap';
+                btn.disabled = false;
+
+            } catch (error) {
+                console.error('Swap error:', error);
+                let errorMsg = 'Swap failed. ';
+
+                // Enhanced error handling with more specific messages
+                if (error.message?.includes('insufficient funds')) {
+                    errorMsg = 'Insufficient balance for this swap';
+                } else if (error.message?.includes('user rejected') || error.message?.includes('User denied')) {
+                    errorMsg = 'Transaction cancelled';
+                } else if (error.message?.includes('allowance')) {
+                    errorMsg = 'Token approval needed - please try again';
+                } else if (error.message?.includes('Transaction would fail')) {
+                    errorMsg = 'Swap conditions changed - please try again';
+                } else if (error.message?.includes('execution reverted')) {
+                    // Try to extract revert reason
+                    if (error.receipt && error.receipt.status === 0) {
+                        errorMsg = 'Transaction reverted - likely due to price impact or slippage';
+                    } else {
+                        errorMsg = 'Transaction failed - please try again';
+                    }
+                } else if (error.message?.includes('network')) {
+                    errorMsg = 'Network error - please check connection';
+                } else {
+                    errorMsg += error.message?.substring(0, 100) || 'Please try again';
+                }
+
+                showStatus(errorMsg, 'error');
+                btn.textContent = 'Swap';
+                btn.disabled = false;
+            }
+        }
+
+        // Event listeners
+        document.getElementById('connectWallet').addEventListener('click', connectWallet);
+        document.getElementById('fromTokenSelector').addEventListener('click', () => openTokenModal('from'));
+        document.getElementById('toTokenSelector').addEventListener('click', () => openTokenModal('to'));
+        document.getElementById('switchTokens').addEventListener('click', switchTokens);
+        document.getElementById('swapButton').addEventListener('click', executeSwap);
+        document.getElementById('closeModal').addEventListener('click', closeTokenModal);
+
+        // Close modal when clicking outside
+        document.getElementById('tokenModal').addEventListener('click', (e) => {
+            if (e.target.id === 'tokenModal') {
+                closeTokenModal();
+            }
+        });
+
+        // Amount input handler with debounced quote
+        document.getElementById('fromAmount').addEventListener('input', (e) => {
+            const amount = e.target.value;
+
+            // Update button state
+            if (amount && parseFloat(amount) > 0) {
+                document.getElementById('swapButton').textContent = 'Swap';
+                document.getElementById('swapButton').disabled = false;
+
+                // Debounce quote fetching to avoid too many API calls
+                clearTimeout(quoteTimeout);
+                quoteTimeout = setTimeout(() => {
+                    getQuote();
+                }, 500);
+            } else {
+                document.getElementById('swapButton').textContent = userAddress ? 'Enter Amount' : 'Connect Wallet';
+                document.getElementById('swapButton').disabled = !userAddress;
+                document.getElementById('toAmount').value = '';
+            }
+        });
+        // Function to show "Coming Soon" modal for footer links
+        function showComingSoon() {
+            // Create modal overlay
+            const overlay = document.createElement('div');
+            overlay.style.cssText = `
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                background: rgba(0, 0, 0, 0.8);
+                display: flex;
+                justify-content: center;
+                align-items: center;
+                z-index: 10000;
+                backdrop-filter: blur(5px);
+            `;
+
+            // Create modal content
+            const modal = document.createElement('div');
+            modal.style.cssText = `
+                background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+                padding: 40px;
+                border-radius: 20px;
+                text-align: center;
+                border: 1px solid #333;
+                box-shadow: 0 20px 40px rgba(0, 0, 0, 0.3);
+                max-width: 400px;
+                margin: 20px;
+            `;
+
+            modal.innerHTML = `
+                <h2 style="color: #ff6b35; margin-bottom: 20px; font-size: 24px;">Coming Soon!</h2>
+                <p style="color: #ccc; margin-bottom: 30px; line-height: 1.6;">
+                    This feature is currently under development. Stay tuned for updates!
+                </p>
+                <button onclick="this.closest('[style*=\"position: fixed\"]').remove()"
+                        style="background: linear-gradient(135deg, #ff6b35 0%, #f7931e 100%);
+                               color: white;
+                               border: none;
+                               padding: 12px 30px;
+                               border-radius: 25px;
+                               cursor: pointer;
+                               font-weight: 600;
+                               transition: transform 0.2s;
+                               font-size: 16px;"
+                        onmouseover="this.style.transform='scale(1.05)'"
+                        onmouseout="this.style.transform='scale(1)'">
+                    Got it!
+                </button>
+            `;
+
+            overlay.appendChild(modal);
+            document.body.appendChild(overlay);
+
+            // Close modal when clicking overlay
+            overlay.addEventListener('click', (e) => {
+                if (e.target === overlay) {
+                    overlay.remove();
+                }
+            });
+        }
+    </script>
+
+    <!-- Footer -->
+    <div class="footer">
+        <div class="footer-content">
+            <div class="footer-socials">
+                <h3>Connect</h3>
+                <div class="social-icons">
+                    <a href="https://twitter.com/pearswap" target="_blank" class="social-icon">𝕏</a>
+                    <a href="https://discord.gg/pearswap" target="_blank" class="social-icon">Discord</a>
+                    <a href="https://t.me/pearswap" target="_blank" class="social-icon">Telegram</a>
+                    <a href="https://github.com/pearswap" target="_blank" class="social-icon">GitHub</a>
+                </div>
+            </div>
+            <div class="footer-links">
+                <h3>Learn</h3>
+                <div class="footer-links-list">
+                    <a href="/technology" class="footer-link">Technology</a>
+                    <a href="/roadmap" class="footer-link">Roadmap</a>
+                    <a href="/terms" class="footer-link">Terms of Service</a>
+                    <span class="footer-link" onclick="showComingSoon()">Documentation</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
