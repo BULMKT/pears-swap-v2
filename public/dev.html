@@ -1001,10 +1001,11 @@
 
                 await updateBalances();
 
-                // Automatically scan wallet tokens in background
-                setTimeout(() => {
-                    detectWalletTokens();
-                }, 500); // Small delay to let wallet fully initialize
+                // INSTANT PRELOAD: Start wallet token detection immediately (no delays)
+                preloadWalletTokens();
+
+                // Setup background refresh timer
+                setupBackgroundRefresh();
 
                 showStatus('Wallet connected successfully!', 'success');
             } catch (error) {
@@ -1013,11 +1014,20 @@
             }
         }
 
-        // Storage for detected wallet tokens with caching
+        // ========================================
+        // INSTANT WALLET TOKEN SYSTEM (NEW APPROACH)
+        // ========================================
+
+        // Global storage for instant token access
+        let walletTokensInstant = []; // Tokens ready for instant display
+        let isWalletTokensLoaded = false; // Track if initial load is complete
+        let backgroundRefreshTimer = null; // Timer for background updates
+
+        // Legacy cache (keeping for compatibility)
         let walletTokens = [];
-        let walletTokensCache = new Map(); // Cache by wallet address
+        let walletTokensCache = new Map();
         let lastWalletScan = 0;
-        const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+        const CACHE_DURATION = 30 * 1000;
 
         // Update token balances and detect wallet tokens
         async function updateBalances() {
@@ -1042,23 +1052,109 @@
             }
         }
 
-        // Detect tokens in user's wallet automatically
-        async function detectWalletTokens() {
+        // ========================================
+        // DYNAMIC PRICE FETCHING
+        // ========================================
+        let priceCache = {};
+        let lastPriceFetch = 0;
+        const PRICE_CACHE_DURATION = 60000; // 1 minute cache
+
+        async function fetchDynamicPrices() {
+            const now = Date.now();
+            if (now - lastPriceFetch < PRICE_CACHE_DURATION && Object.keys(priceCache).length > 0) {
+                return priceCache;
+            }
+
+            try {
+                // Fetch from CoinGecko API (free, reliable, supports multiple tokens)
+                const response = await fetch('https://api.coingecko.com/api/v3/simple/price?ids=ethereum,usd-coin,wrapped-bitcoin,ethereum&vs_currencies=usd');
+                const data = await response.json();
+
+                priceCache = {
+                    'ETH': data.ethereum?.usd || 4200, // Use current price or fallback
+                    'WETH': data.ethereum?.usd || 4200,
+                    'USDC': 1.0,
+                    'DAI': 1.0,
+                    'USDbC': 1.0,
+                    'BRETT': 0.042, // These could be extended with more API calls if needed
+                    'AIXBT': 0.099
+                };
+
+                lastPriceFetch = now;
+                console.log('💰 Updated dynamic prices:', priceCache);
+                return priceCache;
+            } catch (error) {
+                console.error('Failed to fetch dynamic prices:', error);
+                // Fallback to static prices if API fails
+                return {
+                    'ETH': 4200, // Use user's stated current price as fallback
+                    'WETH': 4200,
+                    'USDC': 1.0,
+                    'DAI': 1.0,
+                    'USDbC': 1.0,
+                    'BRETT': 0.042,
+                    'AIXBT': 0.099
+                };
+            }
+        }
+
+        // ========================================
+        // INSTANT WALLET TOKEN FUNCTIONS
+        // ========================================
+
+        // Preload wallet tokens immediately on connect (for instant access)
+        async function preloadWalletTokens() {
+            if (!provider || !userAddress) {
+                console.log('⚠️ Preload skipped - no provider or address');
+                return;
+            }
+
+            console.log('🚀 INSTANT PRELOAD: Starting immediate wallet token detection...');
+
+            try {
+                // Clear any existing data
+                walletTokensInstant = [];
+                isWalletTokensLoaded = false;
+
+                // Start background detection (non-blocking)
+                backgroundRefreshWalletTokens();
+
+            } catch (error) {
+                console.error('Preload failed:', error);
+                isWalletTokensLoaded = false;
+            }
+        }
+
+        // Get wallet tokens instantly (no API calls)
+        function getWalletTokensInstant() {
+            // Removed frequent logging for performance
+            return [...walletTokensInstant]; // Return copy for safety
+        }
+
+        // Setup background refresh timer
+        function setupBackgroundRefresh() {
+            // Clear any existing timer
+            if (backgroundRefreshTimer) {
+                clearInterval(backgroundRefreshTimer);
+            }
+
+            // Refresh every 60 seconds in background (no UI blocking)
+            backgroundRefreshTimer = setInterval(() => {
+                if (provider && userAddress) {
+                    // Reduced logging frequency for performance
+                    backgroundRefreshWalletTokens();
+                }
+            }, 60000); // 60 seconds
+        }
+
+        // Background wallet token refresh (renamed from detectWalletTokens)
+        async function backgroundRefreshWalletTokens() {
             if (!provider || !userAddress) {
                 console.log('⚠️ Wallet detection skipped - no provider or address');
                 return;
             }
 
-            // Check cache first
-            const cacheKey = userAddress.toLowerCase();
-            const now = Date.now();
-
-            if (walletTokensCache.has(cacheKey) && (now - lastWalletScan) < CACHE_DURATION) {
-                console.log('📦 Using cached wallet tokens');
-                walletTokens = walletTokensCache.get(cacheKey);
-                showStatus(`✨ Found ${walletTokens.length} cached tokens in your wallet!`, 'success');
-                return;
-            }
+            // No cache checking - always fetch fresh data in background
 
             try {
                 console.log('🔍 Scanning wallet for tokens...', userAddress);
@@ -1076,12 +1172,12 @@
                 // Process Blockscout data if available
                 if (data && Array.isArray(data) && data.length > 0) {
                     console.log(`Found ${data.length} token balances`);
-                    console.log('Raw token data:', JSON.stringify(data, null, 2));
+                    // Removed verbose JSON logging for performance
                     const detectedTokens = [];
 
                     // Process each token balance directly
                     for (const tokenData of data) {
-                        console.log('Processing token data:', tokenData);
+                        // Reduced per-token logging for performance
 
                         if (tokenData.token && tokenData.value) {
                             const token = tokenData.token;
@@ -1101,7 +1197,12 @@
                                     const formattedBalance = balanceInUnits < 1 ? balanceInUnits.toFixed(6) : balanceInUnits.toFixed(4);
                                     const balanceFloat = parseFloat(formattedBalance);
 
-                                    console.log(`Formatted balance: ${formattedBalance}`);
+                                    // Calculate USD value using Blockscout's exchange_rate
+                                    const tokenPrice = parseFloat(token.exchange_rate) || 0;
+                                    const usdValue = balanceFloat * tokenPrice;
+                                    const formattedUsdValue = usdValue >= 0.01 ? usdValue.toFixed(2) : usdValue.toFixed(4);
+
+                                    console.log(`Formatted balance: ${formattedBalance}, Price: $${tokenPrice}, USD Value: $${formattedUsdValue}`);
 
                                     // Include tokens with any balance above dust level
                                     if (balanceFloat > 0.000001) { // Ultra-low threshold to catch tiny amounts like USDC
@@ -1109,39 +1210,30 @@
                                         const existsInWallet = walletTokens.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
 
                                         if (!existsInWallet) {
-                                            // DOUBLE-CHECK: Verify balance directly from blockchain (API can be stale)
-                                            console.log(`🔍 Double-checking ${tokenSymbol} balance directly from blockchain...`);
-                                            const realTimeBalance = await getTokenBalance(tokenAddress, userAddress);
-                                            const realTimeFloat = parseFloat(realTimeBalance);
+                                            // Check if this token exists in BASE_TOKENS to get proper icon and verification
+                                            const baseToken = BASE_TOKENS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
+                                            const tokenIcon = baseToken?.icon || token.icon_url || await getTokenImage(tokenAddress, tokenSymbol);
+                                            const isVerified = baseToken?.verified || false;
 
-                                            console.log(`📊 ${tokenSymbol}: API balance = ${formattedBalance}, Real-time = ${realTimeBalance}`);
+                                            const walletToken = {
+                                                symbol: tokenSymbol,
+                                                name: baseToken?.name || tokenName,
+                                                address: tokenAddress,
+                                                decimals: decimals,
+                                                icon: tokenIcon,
+                                                verified: isVerified, // Give same verification as base token
+                                                popular: false,
+                                                custom: false,
+                                                wallet: true, // Special flag for wallet-detected tokens
+                                                balance: formattedBalance, // Use API balance for speed
+                                                price: tokenPrice, // USD price from Blockscout
+                                                usdValue: usdValue, // Total USD value of holdings
+                                                formattedUsdValue: formattedUsdValue, // Formatted USD display
+                                                truncatedAddress: truncateAddress(tokenAddress)
+                                            };
 
-                                            // Only add if real-time balance confirms > 0
-                                            if (realTimeFloat > 0.000001) {
-                                                // Check if this token exists in BASE_TOKENS to get proper icon and verification
-                                                const baseToken = BASE_TOKENS.find(t => t.address.toLowerCase() === tokenAddress.toLowerCase());
-                                                const tokenIcon = baseToken?.icon || token.icon_url || await getTokenImage(tokenAddress, tokenSymbol);
-                                                const isVerified = baseToken?.verified || false;
-
-                                                const walletToken = {
-                                                    symbol: tokenSymbol,
-                                                    name: baseToken?.name || tokenName,
-                                                    address: tokenAddress,
-                                                    decimals: decimals,
-                                                    icon: tokenIcon,
-                                                    verified: isVerified, // Give same verification as base token
-                                                    popular: false,
-                                                    custom: false,
-                                                    wallet: true, // Special flag for wallet-detected tokens
-                                                    balance: realTimeBalance, // Use real-time balance, not API balance
-                                                    truncatedAddress: truncateAddress(tokenAddress)
-                                                };
-
-                                                detectedTokens.push(walletToken);
-                                                console.log(`✅ Added wallet token: ${tokenSymbol} (${realTimeBalance}) - confirmed by blockchain`);
-                                            } else {
-                                                console.log(`❌ Skipped ${tokenSymbol} - API shows ${formattedBalance} but blockchain shows ${realTimeBalance} (likely stale API data)`);
-                                            }
+                                            detectedTokens.push(walletToken);
+                                            console.log(`✅ Added wallet token: ${tokenSymbol} (${formattedBalance} = $${formattedUsdValue})`);
                                         } else {
                                             console.log(`⏭️ Skipped ${tokenSymbol} - already in wallet list`);
                                         }
@@ -1156,23 +1248,24 @@
                     }
 
                     if (detectedTokens.length > 0) {
-                        // Add to wallet tokens
-                        walletTokens.push(...detectedTokens);
+                        // Clear and add Blockscout tokens first (they have real prices)
+                        walletTokensInstant = [...detectedTokens];
+                        console.log(`📊 Added ${detectedTokens.length} Blockscout tokens with USD values`);
 
-                        // Sort by balance (highest first)
-                        walletTokens.sort((a, b) => parseFloat(b.balance) - parseFloat(a.balance));
+                        console.log(`⚡ INSTANT UPDATE: ${detectedTokens.length} tokens ready:`, detectedTokens.map(t => `${t.symbol} (${t.balance})`));
 
-                        // Cache the results
-                        walletTokensCache.set(cacheKey, [...walletTokens]);
-                        lastWalletScan = now;
-
-                        console.log(`✨ Found ${detectedTokens.length} tokens in wallet:`, detectedTokens.map(t => `${t.symbol} (${t.balance})`));
-                        showStatus(`✨ Found ${detectedTokens.length} tokens in your wallet!`, 'success');
+                        // Only show status on first load, not background refreshes
+                        if (!isWalletTokensLoaded) {
+                            showStatus(`✨ Found ${detectedTokens.length} tokens in your wallet!`, 'success');
+                        }
 
                         // Update token list display if modal is open
                         if (document.getElementById('tokenModal').style.display === 'block') {
                             renderTokenList(document.getElementById('tokenSearch').value);
                         }
+                    } else {
+                        // Initialize empty array if no Blockscout tokens
+                        walletTokensInstant = [];
                     }
                 }
 
@@ -1195,7 +1288,8 @@
                     try {
                         const balance = await getTokenBalance(token.address, userAddress);
                         const balanceFloat = parseFloat(balance);
-                        if (balanceFloat > 0.000001) { // Ultra-low threshold to catch tiny amounts like USDC
+                        // Always include ETH, even with 0 balance for better UX on Base
+                        if (balanceFloat > 0.000001 || token.symbol === 'ETH') {
                             // Check if token already exists in wallet list (but allow from other lists)
                             const existsInWallet = walletTokens.find(t => t.address.toLowerCase() === token.address.toLowerCase());
 
@@ -1205,11 +1299,29 @@
                                 const tokenIcon = baseToken?.icon || await getTokenImage(token.address, token.symbol);
                                 const isVerified = baseToken?.verified || false;
 
+                                // Get price for common tokens (simplified approach)
+                                let tokenPrice = 0;
+                                let usdValue = 0;
+                                let formattedUsdValue = '0.00';
+
+                                // Dynamic price lookup for major tokens
+                                const commonPrices = await fetchDynamicPrices();
+
+                                if (commonPrices[token.symbol]) {
+                                    tokenPrice = commonPrices[token.symbol];
+                                    usdValue = parseFloat(balance) * tokenPrice;
+                                    formattedUsdValue = usdValue >= 0.01 ? usdValue.toFixed(2) : usdValue.toFixed(4);
+                                    console.log(`💰 Common token ${token.symbol}: ${balance} × $${tokenPrice} = $${formattedUsdValue}`);
+                                }
+
                                 detectedTokens.push({
                                     ...token,
                                     name: baseToken?.name || token.name || token.symbol,
                                     icon: tokenIcon,
                                     balance: balance,
+                                    price: tokenPrice,
+                                    usdValue: usdValue,
+                                    formattedUsdValue: formattedUsdValue,
                                     wallet: true,
                                     verified: isVerified, // Give same verification as base token
                                     popular: false,
@@ -1223,29 +1335,41 @@
                     }
                 }
 
-                if (detectedTokens.length > 0) {
-                    walletTokens.push(...detectedTokens);
-                    walletTokens.sort((a, b) => parseFloat(b.balance) - parseFloat(a.balance));
+                // Add common tokens (like ETH) to existing Blockscout tokens
+                const existingSymbols = new Set(walletTokensInstant.map(t => t.address.toLowerCase()));
+                const newTokens = detectedTokens.filter(t => !existingSymbols.has(t.address.toLowerCase()));
 
-                    // Cache the fallback results too
-                    walletTokensCache.set(cacheKey, [...walletTokens]);
-                    lastWalletScan = now;
+                walletTokensInstant.push(...newTokens);
+                console.log(`➕ Added ${newTokens.length} common tokens (ETH, etc.)`);
 
-                    console.log(`✨ Found ${detectedTokens.length} tokens in wallet:`, detectedTokens.map(t => `${t.symbol} (${t.balance})`));
-                    showStatus(`✨ Found ${detectedTokens.length} tokens in your wallet!`, 'success');
+                // ALWAYS SORT ALL TOKENS: ETH first, then by USD value (highest first)
+                if (walletTokensInstant.length > 0) {
+                    walletTokensInstant.sort((a, b) => {
+                        // Always put ETH at the top for better UX
+                        if (a.symbol === 'ETH' && b.symbol !== 'ETH') return -1;
+                        if (b.symbol === 'ETH' && a.symbol !== 'ETH') return 1;
+
+                        const aUsd = a.usdValue || 0;
+                        const bUsd = b.usdValue || 0;
+                        // Removed per-comparison logging for performance
+                        if (aUsd !== bUsd) return bUsd - aUsd; // Primary sort: USD value
+                        return parseFloat(b.balance) - parseFloat(a.balance); // Secondary sort: token amount
+                    });
+
+                    console.log(`💎 FINAL WALLET ORDER:`, walletTokensInstant.map(t => `${t.symbol} ($${(t.usdValue || 0).toFixed(2)})`));
+
+                    // Update token list display if modal is open
                     if (document.getElementById('tokenModal').style.display === 'block') {
                         renderTokenList(document.getElementById('tokenSearch').value);
                     }
-                } else {
-                    console.log('😕 No tokens with balance > 0 found');
-                    // Cache empty result to avoid repeated scans
-                    walletTokensCache.set(cacheKey, []);
-                    lastWalletScan = now;
                 }
 
+                // Mark as loaded
+                isWalletTokensLoaded = true;
+
             } catch (error) {
-                console.error('Wallet token detection failed:', error);
-                showStatus('Wallet scan failed - will continue without auto-detection', 'error');
+                console.error('Background wallet refresh failed:', error);
+                isWalletTokensLoaded = true; // Don't block UI on errors
             }
         }
 
@@ -1305,8 +1429,8 @@
             const tokenList = document.getElementById('tokenList');
             tokenList.innerHTML = '';
 
-            // Filter tokens based on search query (include wallet tokens)
-            const filteredTokens = [...BASE_TOKENS, ...customTokens, ...walletTokens].filter(token => {
+            // Filter tokens based on search query (include instant wallet tokens)
+            const filteredTokens = [...BASE_TOKENS, ...customTokens, ...getWalletTokensInstant()].filter(token => {
                 if (!searchQuery) return true;
                 const query = searchQuery.toLowerCase();
                 return (
@@ -1333,8 +1457,8 @@
                 !walletAddresses.includes(token.address.toLowerCase()) // Avoid duplicates
             );
 
-            // Sort each category
-            walletTokensFiltered.sort((a, b) => parseFloat(b.balance || '0') - parseFloat(a.balance || '0'));
+            // Wallet tokens are already sorted by USD value in walletTokensInstant - preserve that order
+            // Don't re-sort wallet tokens to maintain the ETH-first, USD-value sorting
             popularTokensFiltered.sort((a, b) => a.symbol.localeCompare(b.symbol));
             otherTokensFiltered.sort((a, b) => a.symbol.localeCompare(b.symbol));
 
@@ -1467,14 +1591,27 @@
                 iconHtml = `<img class="token-item-icon" src="${token.icon}" alt="${token.symbol}" style="width: 32px; height: 32px; border-radius: 50%;">`;
             }
 
+            // Add USD value display for wallet tokens
+            let usdValueDisplay = '';
+            if (token.wallet && token.formattedUsdValue) {
+                usdValueDisplay = `
+                    <div style="color: rgba(254, 116, 91, 0.8); font-size: 12px; font-weight: 600; text-align: right;">
+                        $${token.formattedUsdValue}
+                    </div>
+                `;
+            }
+
             tokenItem.innerHTML = `
                 ${iconHtml}
-                <div class="token-item-info">
+                <div class="token-item-info" style="flex: 1;">
                     <div class="token-item-symbol">${token.symbol}${verifiedBadge}</div>
                     <div class="token-item-name">${nameDisplay}</div>
                     ${additionalInfo}
                 </div>
+                ${usdValueDisplay}
             `;
+
+            tokenItem.style.cssText += 'display: flex; align-items: center; justify-content: space-between; padding: 12px 16px;';
             tokenItem.onclick = () => selectToken(token);
             return tokenItem;
         }
@@ -1487,6 +1624,12 @@
             // Clear search and render all tokens
             tokenSearch.value = '';
             renderTokenList();
+
+            // INSTANT ACCESS: No delays, no API calls when modal opens
+            // Wallet tokens are already preloaded and ready for instant display
+            if (provider && userAddress && !isWalletTokensLoaded) {
+                console.log('⚡ Modal opened before wallet tokens loaded - they will appear when ready');
+            }
 
             // Focus search input
             modal.style.display = 'block';
@@ -1817,13 +1960,16 @@
             document.getElementById('statusMessage').style.display = 'none';
         }
 
-        // Refresh wallet tokens manually (clears cache and re-scans)
+        // Refresh wallet tokens manually (instant system)
         function refreshWalletTokens() {
             console.log('🔄 Manual wallet refresh triggered');
-            walletTokens = [];
-            walletTokensCache.clear();
-            lastWalletScan = 0;
-            detectWalletTokens().then(() => {
+
+            // Clear instant storage
+            walletTokensInstant = [];
+            isWalletTokensLoaded = false;
+
+            // Trigger background refresh
+            backgroundRefreshWalletTokens().then(() => {
                 // Update token list if modal is open
                 if (document.getElementById('tokenModal').style.display === 'block') {
                     renderTokenList(document.getElementById('tokenSearch').value);
@@ -2074,21 +2220,19 @@
                         true // Make it persistent with close button
                     );
 
-                    // Clear wallet token cache since wallet state changed
-                    console.log('🗑️ Clearing wallet cache after successful swap');
-                    walletTokens = [];
-                    walletTokensCache.clear();
-                    lastWalletScan = 0;
+                    // Clear wallet token storage since wallet state changed
+                    console.log('🗑️ Clearing wallet storage after successful swap');
+                    walletTokensInstant = [];
+                    isWalletTokensLoaded = false;
 
                     // Clear inputs and update balances
                     document.getElementById('fromAmount').value = '';
                     document.getElementById('toAmount').value = '';
                     await updateBalances();
 
-                    // Re-scan wallet tokens after a short delay to pick up new tokens
-                    setTimeout(() => {
-                        detectWalletTokens();
-                    }, 2000); // 2 second delay to let blockchain settle
+                    // Immediate refresh of wallet tokens (no delay needed)
+                    console.log('🔄 Immediate wallet refresh after swap');
+                    backgroundRefreshWalletTokens();
                 } else {
                     throw new Error('Transaction failed');
                 }
