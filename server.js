@@ -303,6 +303,11 @@ app.get('/technology', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'technology.html'));
 });
 
+// Serve changelog page
+app.get('/changelog', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'changelog.html'));
+});
+
 // Serve privacy policy page
 app.get('/privacy', (req, res) => {
   res.sendFile(path.join(__dirname, 'public', 'privacy.html'));
