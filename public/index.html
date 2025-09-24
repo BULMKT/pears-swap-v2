@@ -945,7 +945,7 @@
         async function connectWallet() {
             try {
                 if (typeof window.ethereum === 'undefined') {
-                    showStatus('Please install MetaMask!', 'error');
+                    showStatus('Please install a Web3 wallet!', 'error');
                     return;
                 }
 
@@ -2160,7 +2160,7 @@
                     // If allowance is insufficient, approve
                     if (currentAllowance < requiredAmount) {
                         btn.textContent = 'Approve token...';
-                        showStatus('📱 Please approve token spending in MetaMask', 'info');
+                        showStatus('📱 Please approve token spending in your wallet', 'info');
 
                         // Create approval transaction with signer
                         const tokenContractWithSigner = tokenContract.connect(signer);
@@ -2214,7 +2214,7 @@
 
                 // Step 4: Execute transaction with fresh data
                 btn.textContent = 'Confirming swap...';
-                showStatus('📱 Please confirm the swap in MetaMask', 'info');
+                showStatus('📱 Please confirm the swap in your wallet', 'info');
 
                 const txParams = {
                     to: finalSwapData.to,
